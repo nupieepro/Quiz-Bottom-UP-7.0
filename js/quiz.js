@@ -1,5 +1,13 @@
 // Lógica da experiência do participante (index.html):
-// identificação → perguntas cronometradas → resultado final.
+// identificação → sala de espera → perguntas sincronizadas pelo
+// admin (sessão ao vivo) → resultado final.
+//
+// O relógio que manda é o do servidor: cada pergunta tem um
+// "prazo_fim" absoluto (timestamp) devolvido pelo backend, e o
+// timer na tela é sempre recalculado a partir dele — não é um
+// contador local que só decrementa. Isso evita qualquer desvio
+// por causa de rede lenta, celular travado ou aba em segundo
+// plano, e garante que todo mundo vê o mesmo prazo que o telão.
 (() => {
   const CATEGORIAS = {
     operacoes: { label: 'Operações', cor: 'var(--cat-operacoes)' },
@@ -22,10 +30,12 @@
   const CIRCUNFERENCIA = 2 * Math.PI * 15.5;
   const CHAVE_TENTATIVA = 'quizbu_tentativa_id';
   const CHAVE_NOME = 'quizbu_nome';
-  const TEMPO_ESGOTADO = '_tempo_esgotado';
+  const INTERVALO_POLL_MS = 2000;
+  const INTERVALO_TICK_MS = 200;
 
   const telas = {
     identificacao: document.getElementById('tela-identificacao'),
+    lobby: document.getElementById('tela-lobby'),
     quiz: document.getElementById('tela-quiz'),
     resultado: document.getElementById('tela-resultado'),
     mensagem: document.getElementById('tela-mensagem'),
@@ -33,15 +43,18 @@
 
   const estado = {
     tentativaId: null,
-    questaoId: null,
-    tempoLimiteSeg: 25,
-    segRestantes: 25,
-    inicioPerguntaMs: 0,
+    telaAtual: null,
+    numeroPerguntaExibida: null,
     respondida: false,
-    intervaloTimer: null,
+    prazoFim: null,
+    pontuacaoAtual: 0,
+    tickTimer: null,
+    pollTimer: null,
   };
 
   function mostrarTela(nome) {
+    if (estado.telaAtual === nome) return;
+    estado.telaAtual = nome;
     Object.values(telas).forEach((el) => el.classList.add('oculto'));
     telas[nome].classList.remove('oculto');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -49,6 +62,20 @@
 
   function limparErros() {
     document.querySelectorAll('.erro-campo').forEach((el) => (el.textContent = ''));
+  }
+  function setErro(idCampo, msg) {
+    const el = document.querySelector(`[data-erro-de="${idCampo}"]`);
+    if (el) el.textContent = msg;
+  }
+  function escaparHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  function alternarCarregamento(carregando) {
+    document.getElementById('botao-comecar').disabled = carregando;
+    document.querySelector('#botao-comecar .rotulo-botao').classList.toggle('oculto', carregando);
+    document.getElementById('spinner-comecar').classList.toggle('oculto', !carregando);
   }
 
   // ── Tela 1: identificação ──
@@ -71,18 +98,10 @@
         p_nome: nome, p_sobrenome: sobrenome, p_curso: curso,
       });
       sessionStorage.setItem(CHAVE_NOME, resultado.nome || nome);
-
-      if (resultado.status === 'ja_participou') {
-        exibirJaParticipou(resultado);
-        return;
-      }
-
       sessionStorage.setItem(CHAVE_TENTATIVA, resultado.tentativa_id);
       estado.tentativaId = resultado.tentativa_id;
-      if (resultado.status === 'retomar') {
-        mostrarToast('Retomando o quiz de onde você parou.', 'info');
-      }
-      await carregarProximaPergunta();
+      document.getElementById('lobby-nome').textContent = (resultado.nome || nome).split(' ')[0];
+      iniciarSincronizacao();
     } catch (erro) {
       mostrarToast(erro.message, 'erro');
     } finally {
@@ -90,46 +109,53 @@
     }
   });
 
-  function setErro(idCampo, msg) {
-    const el = document.querySelector(`[data-erro-de="${idCampo}"]`);
-    if (el) el.textContent = msg;
+  // ── Sincronização com a sessão ao vivo ──
+  function iniciarSincronizacao() {
+    pararRelogios();
+    sincronizarEstado();
+    estado.pollTimer = setInterval(sincronizarEstado, INTERVALO_POLL_MS);
   }
 
-  function alternarCarregamento(carregando) {
-    document.getElementById('botao-comecar').disabled = carregando;
-    document.querySelector('#botao-comecar .rotulo-botao').classList.toggle('oculto', carregando);
-    document.getElementById('spinner-comecar').classList.toggle('oculto', !carregando);
+  function pararRelogios() {
+    if (estado.pollTimer) clearInterval(estado.pollTimer);
+    if (estado.tickTimer) clearInterval(estado.tickTimer);
+    estado.pollTimer = null;
+    estado.tickTimer = null;
   }
 
-  function exibirJaParticipou(dados) {
-    document.getElementById('mensagem-titulo').textContent = 'Você já participou!';
-    document.getElementById('mensagem-texto').textContent =
-      `Olá, ${dados.nome}. Sua pontuação registrada foi de ${dados.pontuacao} pontos. Cada pessoa participa uma única vez — confira sua posição no ranking completo.`;
-    mostrarTela('mensagem');
-  }
-
-  // ── Tela 2: quiz ──
-  async function carregarProximaPergunta() {
-    const dados = await QuizClient.rpc('obter_pergunta_atual', { p_tentativa_id: estado.tentativaId });
-    if (dados.status === 'finalizado') {
-      await finalizarEExibir();
-      return;
+  async function sincronizarEstado() {
+    try {
+      const dados = await QuizClient.rpc('obter_estado_sessao');
+      if (dados.estado === 'aguardando') {
+        mostrarTela('lobby');
+      } else if (dados.estado === 'ativa') {
+        aplicarPerguntaAtiva(dados);
+      } else if (dados.estado === 'finalizada') {
+        pararRelogios();
+        await exibirResultadoFinal();
+      }
+    } catch (erro) {
+      console.error('Falha ao sincronizar com a sessão:', erro.message);
     }
-    renderizarPergunta(dados);
-    mostrarTela('quiz');
+  }
+
+  function aplicarPerguntaAtiva(dados) {
+    if (dados.numero !== estado.numeroPerguntaExibida) {
+      estado.numeroPerguntaExibida = dados.numero;
+      estado.respondida = false;
+      estado.prazoFim = new Date(dados.prazo_fim).getTime();
+      estado.tempoLimiteMs = dados.tempo_por_pergunta_seg * 1000;
+      renderizarPergunta(dados);
+      mostrarTela('quiz');
+      if (!estado.tickTimer) estado.tickTimer = setInterval(tick, INTERVALO_TICK_MS);
+      tick();
+    }
   }
 
   function renderizarPergunta(dados) {
-    pararTimer();
-    estado.questaoId = dados.pergunta.id;
-    estado.respondida = false;
-    estado.tempoLimiteSeg = dados.tempo_limite_seg;
-    estado.segRestantes = dados.tempo_limite_seg;
-    estado.inicioPerguntaMs = Date.now();
-
     document.getElementById('texto-progresso').textContent = `Pergunta ${dados.numero} de ${dados.total_perguntas}`;
     document.getElementById('barra-progresso').style.width = `${((dados.numero - 1) / dados.total_perguntas) * 100}%`;
-    document.getElementById('pontuacao-atual').textContent = dados.pontuacao_atual;
+    document.getElementById('pontuacao-atual').textContent = estado.pontuacaoAtual;
 
     const cat = CATEGORIAS[dados.pergunta.categoria] || CATEGORIAS.geral;
     const badgeCat = document.getElementById('badge-categoria');
@@ -152,51 +178,40 @@
       btn.type = 'button';
       btn.dataset.id = opcao.id;
       btn.innerHTML = `<span class="letra-opcao">${letras[i]}</span><span>${escaparHtml(opcao.texto)}</span>`;
-      btn.addEventListener('click', () => responderPergunta(opcao.id));
+      btn.addEventListener('click', () => responderPergunta(dados.pergunta.id, opcao.id));
       lista.appendChild(btn);
     });
 
     document.getElementById('feedback-resposta').classList.add('oculto');
-    iniciarTimer();
   }
 
-  function escaparHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+  function tick() {
+    const restanteMs = Math.max(0, estado.prazoFim - Date.now());
+    atualizarTimerVisual(restanteMs);
+    if (restanteMs <= 0 && !estado.respondida) {
+      estado.respondida = true;
+      document.querySelectorAll('.opcao').forEach((btn) => {
+        btn.disabled = true;
+        btn.classList.add('tempo-esgotado-nao-respondida');
+      });
+      exibirAguardandoAvanco('⏱️', 'Tempo esgotado', 'O organizador vai avançar em instantes.');
+    }
   }
 
-  function iniciarTimer() {
-    atualizarTimerVisual();
-    estado.intervaloTimer = setInterval(() => {
-      estado.segRestantes -= 1;
-      atualizarTimerVisual();
-      if (estado.segRestantes <= 0) {
-        pararTimer();
-        responderPergunta(TEMPO_ESGOTADO);
-      }
-    }, 1000);
-  }
-
-  function pararTimer() {
-    if (estado.intervaloTimer) clearInterval(estado.intervaloTimer);
-    estado.intervaloTimer = null;
-  }
-
-  function atualizarTimerVisual() {
+  function atualizarTimerVisual(restanteMs) {
+    const segundosRestantes = Math.ceil(restanteMs / 1000);
     const circulo = document.getElementById('timer-circulo');
-    const fracao = Math.max(estado.segRestantes, 0) / estado.tempoLimiteSeg;
+    const fracao = estado.tempoLimiteMs ? Math.max(restanteMs, 0) / estado.tempoLimiteMs : 1;
     circulo.style.strokeDashoffset = CIRCUNFERENCIA * (1 - fracao);
-    circulo.classList.toggle('tempo-critico', estado.segRestantes <= 5);
-    document.getElementById('timer-segundos').textContent = Math.max(estado.segRestantes, 0);
+    circulo.classList.toggle('tempo-critico', segundosRestantes <= 5);
+    document.getElementById('timer-segundos').textContent = Math.max(segundosRestantes, 0);
   }
 
-  async function responderPergunta(opcaoId) {
+  async function responderPergunta(questaoId, opcaoId) {
     if (estado.respondida) return;
     estado.respondida = true;
-    pararTimer();
 
-    const tempoGastoMs = Date.now() - estado.inicioPerguntaMs;
+    const tempoGastoMs = estado.tempoLimiteMs ? (estado.tempoLimiteMs - Math.max(0, estado.prazoFim - Date.now())) : 0;
     document.querySelectorAll('.opcao').forEach((btn) => {
       btn.disabled = true;
       if (btn.dataset.id === opcaoId) btn.classList.add('selecionada');
@@ -205,15 +220,15 @@
     try {
       const resp = await QuizClient.rpc('responder', {
         p_tentativa_id: estado.tentativaId,
-        p_questao_id: estado.questaoId,
+        p_questao_id: questaoId,
         p_opcao_id: opcaoId,
-        p_tempo_gasto_ms: tempoGastoMs,
+        p_tempo_gasto_ms: Math.round(tempoGastoMs),
       });
+      estado.pontuacaoAtual = resp.pontuacao_total;
       exibirFeedback(resp, opcaoId);
     } catch (erro) {
       mostrarToast(erro.message, 'erro');
-      // reconciliação: revalida com o servidor pra evitar tela travada
-      await carregarProximaPergunta();
+      exibirAguardandoAvanco('⚠️', 'Não foi possível registrar', 'Aguardando a próxima pergunta...');
     }
   }
 
@@ -222,22 +237,26 @@
       if (btn.dataset.id === resp.resposta_correta) btn.classList.add('correta');
       else if (btn.dataset.id === opcaoEscolhidaId) btn.classList.add('incorreta');
     });
-
     document.getElementById('pontuacao-atual').textContent = resp.pontuacao_total;
-    document.getElementById('feedback-icone').textContent = resp.correta ? '✅' : '❌';
-    document.getElementById('feedback-titulo').textContent = resp.correta ? 'Resposta certa!' : (opcaoEscolhidaId === TEMPO_ESGOTADO ? 'Tempo esgotado' : 'Não foi dessa vez');
-    document.getElementById('feedback-pontos').textContent = resp.pontos_obtidos > 0 ? `+${resp.pontos_obtidos} pts` : '+0 pts';
-    document.getElementById('feedback-explicacao').textContent = resp.explicacao || '';
-    document.getElementById('feedback-resposta').classList.remove('oculto');
+    exibirAguardandoAvanco(
+      resp.correta ? '✅' : '❌',
+      resp.correta ? 'Resposta certa!' : 'Não foi dessa vez',
+      resp.explicacao || '',
+      resp.pontos_obtidos,
+    );
+  }
 
-    const botaoContinuar = document.getElementById('botao-continuar');
-    botaoContinuar.textContent = resp.finalizado ? 'Ver resultado final' : 'Próxima pergunta';
-    botaoContinuar.onclick = () => (resp.finalizado ? finalizarEExibir() : carregarProximaPergunta());
+  function exibirAguardandoAvanco(icone, titulo, explicacao, pontos) {
+    document.getElementById('feedback-icone').textContent = icone;
+    document.getElementById('feedback-titulo').textContent = titulo;
+    document.getElementById('feedback-pontos').textContent = pontos > 0 ? `+${pontos} pts` : (pontos === 0 ? '+0 pts' : '');
+    document.getElementById('feedback-explicacao').textContent = explicacao || '';
+    document.getElementById('feedback-resposta').classList.remove('oculto');
   }
 
   // ── Tela 3: resultado ──
-  async function finalizarEExibir() {
-    const resultado = await QuizClient.rpc('finalizar_tentativa', { p_tentativa_id: estado.tentativaId });
+  async function exibirResultadoFinal() {
+    const resultado = await QuizClient.rpc('obter_meu_resultado', { p_tentativa_id: estado.tentativaId });
     const nome = sessionStorage.getItem(CHAVE_NOME) || 'Participante';
     document.getElementById('texto-nome-resultado').textContent = `Parabéns, ${nome.split(' ')[0]}! Este foi o seu desempenho:`;
     document.getElementById('resultado-pontuacao').textContent = resultado.pontuacao;
@@ -253,15 +272,12 @@
     return `${Math.floor(totalSeg / 60)}m ${totalSeg % 60}s`;
   }
 
-  // ── Retomada automática ──
-  (async function iniciar() {
+  // ── Retomada automática (reabriu a aba no meio do evento) ──
+  (function iniciar() {
     const tentativaSalva = sessionStorage.getItem(CHAVE_TENTATIVA);
     if (!tentativaSalva) return;
     estado.tentativaId = tentativaSalva;
-    try {
-      await carregarProximaPergunta();
-    } catch (erro) {
-      sessionStorage.removeItem(CHAVE_TENTATIVA);
-    }
+    document.getElementById('lobby-nome').textContent = (sessionStorage.getItem(CHAVE_NOME) || '').split(' ')[0];
+    iniciarSincronizacao();
   })();
 })();

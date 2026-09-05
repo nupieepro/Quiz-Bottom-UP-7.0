@@ -62,7 +62,16 @@
       </div>
     </section>
 
-    <!-- ═══ TELA 2 — QUIZ ═══ -->
+    <!-- ═══ TELA — SALA DE ESPERA (aguardando o admin iniciar) ═══ -->
+    <section id="tela-lobby" class="tela-central oculto">
+      <div class="cartao cartao-mensagem">
+        <div class="spinner spinner-navy" style="margin:0 auto 20px;"></div>
+        <h1 class="titulo-resultado">Tudo pronto, <span id="lobby-nome"></span>!</h1>
+        <p class="texto-resultado">O quiz começa assim que o organizador der o start no telão. Fique com essa tela aberta — ela avança sozinha.</p>
+      </div>
+    </section>
+
+    <!-- ═══ TELA 2 — QUIZ (sincronizado com a sessão ao vivo) ═══ -->
     <section id="tela-quiz" class="tela-central oculto">
       <div class="cartao cartao-quiz">
         <div class="cabecalho-quiz">
@@ -99,7 +108,10 @@
             <span class="feedback-pontos" id="feedback-pontos"></span>
           </div>
           <p class="feedback-explicacao" id="feedback-explicacao"></p>
-          <button class="botao botao-primario botao-bloco" id="botao-continuar">Continuar</button>
+          <div class="aguardando-avanco">
+            <span class="spinner spinner-navy"></span>
+            <span>Aguardando o organizador avançar a pergunta...</span>
+          </div>
         </div>
       </div>
     </section>
