@@ -52,7 +52,23 @@ Identidade visual herdada do Nupieepro e do material oficial do Bottom UP 7.0: a
 
 ## Perguntas
 
-O banco inicial tem 20 perguntas de Engenharia de Produção (2 por área ABEPRO: Operações, Logística, Pesquisa Operacional, Qualidade, Produto, Organizacional, Econômica, Trabalho, Sustentabilidade e Tecnologia/Inovação). Tudo — enunciado, opções, resposta certa, explicação, dificuldade, pontuação e ordem — é editável pelo painel admin, sem precisar mexer no banco.
+O banco inicial tem 20 perguntas de Engenharia de Produção (2 por área ABEPRO: Operações, Logística, Pesquisa Operacional, Qualidade, Produto, Organizacional, Econômica, Trabalho, Sustentabilidade e Tecnologia/Inovação), todas conceituais — nenhuma exige cálculo pra responder. Tudo — enunciado, opções, resposta certa, explicação, dificuldade, pontuação e ordem — é editável pelo painel admin, sem precisar mexer no banco.
+
+No editor de perguntas (`admin.html` → **+ Nova pergunta** ou ✏️ numa existente) tem um **modo texto**: em vez de preencher campo por campo, dá pra colar tudo de uma vez nesse formato e clicar em "Preencher formulário":
+
+```
+Qual é a capital do Brasil?
+a) São Paulo
+b) Brasília
+c) Rio de Janeiro
+d) Salvador
+Resposta: b
+Explicação: Brasília é a capital federal desde 1960.
+Categoria: educacao
+Dificuldade: facil
+```
+
+`Explicação`, `Categoria` e `Dificuldade` são opcionais — o sistema separa enunciado, alternativas e resposta certa sozinho e você só confere antes de salvar.
 
 ## Pontuação e ranking
 

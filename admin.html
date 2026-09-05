@@ -159,6 +159,29 @@
     </div>
     <form id="form-pergunta">
       <input type="hidden" id="pg-id">
+
+      <div class="bloco-modo-texto">
+        <button type="button" class="botao botao-fantasma botao-sm" id="botao-mostrar-modo-texto">📋 Colar pergunta pronta (modo texto)</button>
+        <div id="area-modo-texto" class="oculto">
+          <div class="campo">
+            <textarea id="texto-colado" rows="9" placeholder="Qual é a capital do Brasil?
+a) São Paulo
+b) Brasília
+c) Rio de Janeiro
+d) Salvador
+Resposta: b
+Explicação: Brasília é a capital federal desde 1960.
+Categoria: geral
+Dificuldade: facil"></textarea>
+          </div>
+          <p class="dica-campo dica-modo-texto">
+            Cole o enunciado, uma alternativa por linha começando com a letra (a, b, c…), depois
+            <code>Resposta: &lt;letra&gt;</code>. <code>Explicação:</code>, <code>Categoria:</code> e <code>Dificuldade:</code> são opcionais.
+          </p>
+          <button type="button" class="botao botao-secundario botao-sm" id="botao-interpretar-texto">Preencher formulário com esse texto</button>
+        </div>
+      </div>
+
       <div class="grade-2">
         <div class="campo">
           <label for="pg-categoria">Categoria</label>

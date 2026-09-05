@@ -115,6 +115,19 @@ body:has(#painel-admin:not(.oculto)) { background: var(--cream-2); }
 .modal-fechar { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: var(--ink-faint); }
 .modal-rodape { display: flex; justify-content: flex-end; gap: var(--s3); margin-top: var(--s6); }
 
+.bloco-modo-texto { margin-bottom: var(--s5); }
+.bloco-modo-texto #area-modo-texto {
+  margin-top: var(--s3); padding: var(--s4); background: var(--cream-2);
+  border: 1px dashed var(--border-medium); border-radius: var(--r-md);
+}
+.bloco-modo-texto textarea {
+  width: 100%; font-family: var(--fonte-mono); font-size: 13px; line-height: 1.6;
+  border: 2px solid var(--border-soft); border-radius: var(--r-sm); padding: 12px;
+  resize: vertical; background: #fff;
+}
+.dica-modo-texto { margin: 8px 0 12px; }
+.dica-modo-texto code { background: var(--border-soft); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+
 .linha-opcao-editor { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .linha-opcao-editor input[type="radio"] { width: 18px; height: 18px; accent-color: var(--sucesso); flex-shrink: 0; }
 .linha-opcao-editor input[type="text"] {

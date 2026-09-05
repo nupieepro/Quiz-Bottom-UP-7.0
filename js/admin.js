@@ -189,8 +189,100 @@
       estado.correctIndex = 0;
     }
     renderizarOpcoesEditor();
+    el('texto-colado').value = '';
+    el('area-modo-texto').classList.add('oculto');
+    el('botao-mostrar-modo-texto').textContent = '📋 Colar pergunta pronta (modo texto)';
     el('modal-pergunta').classList.remove('oculto');
   }
+
+  // ── Modo texto: cola tudo (enunciado + alternativas + resposta) numa
+  // caixa só e o sistema separa — pensado pra quem tem as perguntas
+  // prontas num documento e não quer preencher campo por campo.
+  el('botao-mostrar-modo-texto').addEventListener('click', () => {
+    const area = el('area-modo-texto');
+    const abrindo = area.classList.contains('oculto');
+    area.classList.toggle('oculto');
+    el('botao-mostrar-modo-texto').textContent = abrindo
+      ? '📋 Ocultar modo texto'
+      : '📋 Colar pergunta pronta (modo texto)';
+  });
+
+  const CATEGORIA_SINONIMOS = {
+    operacoes: 'operacoes', operacao: 'operacoes', producao: 'operacoes',
+    logistica: 'logistica',
+    pesqop: 'pesqop', 'pesquisaoperacional': 'pesqop', po: 'pesqop',
+    qualidade: 'qualidade',
+    produto: 'produto',
+    organizacional: 'organizacional', organizacao: 'organizacional', gestao: 'organizacional',
+    economica: 'economica', economia: 'economica',
+    trabalho: 'trabalho', ergonomia: 'trabalho',
+    sustentabilidade: 'sustentabilidade', sustentavel: 'sustentabilidade',
+    educacao: 'educacao', tecnologia: 'educacao', inovacao: 'educacao', geral: 'geral',
+  };
+
+  function normalizarChave(str) {
+    return str.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '');
+  }
+
+  function interpretarTextoColado(texto) {
+    const linhas = texto.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+    const opcaoRegex = /^([a-fA-F])[).:-]\s*(.+)$/;
+    const respostaRegex = /^resposta(\s*correta)?\s*:\s*([a-fA-F])/i;
+    const explicacaoRegex = /^explica[cç][aã]o\s*:\s*(.+)$/i;
+    const categoriaRegex = /^categoria\s*:\s*(.+)$/i;
+    const dificuldadeRegex = /^dificuldade\s*:\s*(.+)$/i;
+
+    const enunciadoLinhas = [];
+    const opcoesColadas = [];
+    let letraCorreta = null, explicacao = null, categoria = null, dificuldade = null;
+
+    linhas.forEach((linha) => {
+      let m;
+      if ((m = linha.match(respostaRegex))) { letraCorreta = m[2].toLowerCase(); return; }
+      if ((m = linha.match(explicacaoRegex))) { explicacao = m[1].trim(); return; }
+      if ((m = linha.match(categoriaRegex))) { categoria = CATEGORIA_SINONIMOS[normalizarChave(m[1])] || null; return; }
+      if ((m = linha.match(dificuldadeRegex))) {
+        const chave = normalizarChave(m[1]);
+        dificuldade = ['facil', 'medio', 'dificil'].includes(chave) ? chave : null;
+        return;
+      }
+      if ((m = linha.match(opcaoRegex))) { opcoesColadas.push({ letra: m[1].toLowerCase(), texto: m[2].trim() }); return; }
+      if (opcoesColadas.length === 0) enunciadoLinhas.push(linha);
+    });
+
+    if (opcoesColadas.length < 2) return { erro: 'Não encontrei pelo menos 2 alternativas no formato "a) texto". Confira o exemplo no campo.' };
+    if (!enunciadoLinhas.length) return { erro: 'Não encontrei o enunciado da pergunta (a primeira linha, antes das alternativas).' };
+
+    let correctIndex = letraCorreta ? opcoesColadas.findIndex((o) => o.letra === letraCorreta) : -1;
+    let avisoResposta = null;
+    if (correctIndex < 0) { correctIndex = 0; avisoResposta = letraCorreta ? `Não encontrei a alternativa "${letraCorreta}" — marquei a primeira como correta, confira.` : 'Nenhuma linha "Resposta: <letra>" encontrada — marquei a primeira alternativa como correta, confira.'; }
+
+    return {
+      enunciado: enunciadoLinhas.join(' '),
+      opcoes: opcoesColadas.map((o) => o.texto),
+      correctIndex, explicacao, categoria, dificuldade, avisoResposta,
+    };
+  }
+
+  el('botao-interpretar-texto').addEventListener('click', () => {
+    const bruto = el('texto-colado').value;
+    if (!bruto.trim()) return mostrarToast('Cole o texto da pergunta primeiro.', 'erro');
+
+    const resultado = interpretarTextoColado(bruto);
+    if (resultado.erro) return mostrarToast(resultado.erro, 'erro');
+
+    el('pg-enunciado').value = resultado.enunciado;
+    estado.opcoesEditor = resultado.opcoes;
+    estado.correctIndex = resultado.correctIndex;
+    renderizarOpcoesEditor();
+    if (resultado.explicacao) el('pg-explicacao').value = resultado.explicacao;
+    if (resultado.categoria) el('pg-categoria').value = resultado.categoria;
+    if (resultado.dificuldade) el('pg-dificuldade').value = resultado.dificuldade;
+
+    el('area-modo-texto').classList.add('oculto');
+    el('botao-mostrar-modo-texto').textContent = '📋 Colar pergunta pronta (modo texto)';
+    mostrarToast(resultado.avisoResposta || 'Formulário preenchido — confira os campos e clique em Salvar.', resultado.avisoResposta ? 'erro' : 'sucesso');
+  });
 
   function fecharModal() { el('modal-pergunta').classList.add('oculto'); }
   el('botao-fechar-modal').addEventListener('click', fecharModal);
