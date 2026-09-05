@@ -1,0 +1,111 @@
+/* ============================================================
+   QUIZ BOTTOM UP 7.0 — Design Tokens
+   Identidade visual herdada do Nupieepro / evento Bottom UP 7.0:
+   azul marinho + laranja + dourado sobre fundo creme, tipografia
+   League Spartan (UI) + Adumu (wordmark/display).
+   ============================================================ */
+
+@font-face {
+  font-family: 'Adumu';
+  src: url('../assets/fonts/adumu-regular-subset.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'League Spartan Local';
+  src: url('../assets/fonts/leaguespartan-bold-subset.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ── Marca ── */
+  --navy: #0f0732;
+  --navy-2: #1a1245;
+  --navy-3: #221454;
+  --orange: #d0541a;
+  --orange-2: #e8752f;
+  --orange-bright: #f85900;
+  --orange-glow: rgba(216, 92, 26, 0.35);
+  --gold: #ffb627;
+  --white: #ffffff;
+  --black: #000000;
+
+  /* ── Fundo / superfícies ── */
+  --cream: #fbf3e7;
+  --cream-2: #f5ebda;
+  --card-bg: #ffffff;
+  --navy-surface-1: #170d42;
+  --navy-surface-2: #221454;
+  --navy-surface-3: #2c1c66;
+
+  /* ── Texto ── */
+  --ink: #0f0732;
+  --ink-soft: #5a5575;
+  --ink-faint: #9490ab;
+  --on-navy: #ffffff;
+  --on-navy-soft: #b8ccd8;
+
+  /* ── Bordas ── */
+  --border-soft: rgba(15, 7, 50, 0.08);
+  --border-medium: rgba(15, 7, 50, 0.14);
+  --border-on-navy: rgba(255, 255, 255, 0.12);
+
+  /* ── Semântico ── */
+  --sucesso: #27ae60;
+  --sucesso-bg: #e8f5e9;
+  --sucesso-texto: #1b5e20;
+  --erro: #e74c3c;
+  --erro-bg: #fff0f0;
+  --erro-texto: #b71c1c;
+  --aviso: #f39c12;
+  --aviso-bg: #fff8e1;
+  --aviso-texto: #8a5a00;
+  --info: #2980b9;
+  --info-bg: #e3f2fd;
+  --info-texto: #1565c0;
+
+  /* ── Categorias (áreas ABEPRO) ── */
+  --cat-operacoes: #5b9cf6;
+  --cat-logistica: #6ad6c8;
+  --cat-pesqop: #f65214;
+  --cat-qualidade: #2dd4a0;
+  --cat-produto: #ffb627;
+  --cat-organizacional: #9b7be8;
+  --cat-economica: #4ade80;
+  --cat-trabalho: #f5c518;
+  --cat-sustentabilidade: #34d399;
+  --cat-educacao: #e85aa8;
+  --cat-geral: #d0541a;
+
+  /* ── Tipografia ── */
+  --fonte-display: 'Adumu', 'League Spartan', system-ui, sans-serif;
+  --fonte-titulo: 'League Spartan', system-ui, sans-serif;
+  --fonte-corpo: 'League Spartan', system-ui, -apple-system, sans-serif;
+  --fonte-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* ── Sombra ── */
+  --sombra-sm: 0 2px 8px rgba(15, 7, 50, 0.08);
+  --sombra-md: 0 10px 30px rgba(15, 7, 50, 0.12);
+  --sombra-lg: 0 24px 60px rgba(15, 7, 50, 0.22);
+  --sombra-laranja: 0 10px 30px var(--orange-glow);
+
+  /* ── Raio ── */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-full: 9999px;
+
+  /* ── Espaçamento ── */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px;
+  --s12: 48px; --s16: 64px; --s20: 80px;
+
+  /* ── Transição ── */
+  --transicao-rapida: 0.15s ease;
+  --transicao-base: 0.25s cubic-bezier(.4,0,.2,1);
+}

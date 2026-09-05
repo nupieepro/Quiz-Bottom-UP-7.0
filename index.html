@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f0732">
+<meta name="description" content="Quiz oficial do Bottom UP 7.0 — teste seus conhecimentos de Engenharia de Produção e dispute o ranking ao vivo.">
+<title>Quiz Bottom UP 7.0</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/quiz.css">
+</head>
+<body>
+
+<div class="fundo-evento">
+  <header class="topo">
+    <div class="lockup">
+      <div class="selo-quadrado"><span>B</span></div>
+      <div>
+        <div class="marca-evento">
+          <span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span>
+        </div>
+        <div class="subtitulo-evento" id="subtitulo-evento">Inovação que transforma: tecnologia, pessoas e sustentabilidade</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="conteudo-quiz">
+
+    <!-- ═══ TELA 1 — IDENTIFICAÇÃO ═══ -->
+    <section id="tela-identificacao" class="tela-central">
+      <div class="cartao cartao-identificacao">
+        <span class="badge badge-medio etiqueta-topo">Quiz oficial do evento</span>
+        <h1 class="titulo-hero">Quiz <span class="destaque-laranja">Bottom UP 7.0</span></h1>
+        <p class="texto-intro">Vinte perguntas de Engenharia de Produção. Responda rápido e com precisão — sua pontuação combina acerto e velocidade, e vai direto para o ranking ao vivo do evento.</p>
+
+        <form id="form-identificacao" novalidate>
+          <div class="campo">
+            <label for="input-nome">Nome</label>
+            <input id="input-nome" type="text" autocomplete="given-name" maxlength="60" placeholder="Ex.: Maria" required>
+            <div class="erro-campo" data-erro-de="input-nome"></div>
+          </div>
+          <div class="campo">
+            <label for="input-sobrenome">Sobrenome</label>
+            <input id="input-sobrenome" type="text" autocomplete="family-name" maxlength="60" placeholder="Ex.: Oliveira Santos" required>
+            <div class="erro-campo" data-erro-de="input-sobrenome"></div>
+          </div>
+          <div class="campo">
+            <label for="input-curso">Curso</label>
+            <input id="input-curso" type="text" autocomplete="off" maxlength="80" placeholder="Ex.: Engenharia de Produção" required>
+            <div class="erro-campo" data-erro-de="input-curso"></div>
+          </div>
+          <button type="submit" class="botao botao-primario botao-bloco" id="botao-comecar">
+            <span class="rotulo-botao">Começar o quiz</span>
+            <span class="spinner oculto" id="spinner-comecar"></span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ═══ TELA 2 — QUIZ ═══ -->
+    <section id="tela-quiz" class="tela-central oculto">
+      <div class="cartao cartao-quiz">
+        <div class="cabecalho-quiz">
+          <div class="progresso-info">
+            <span id="texto-progresso">Pergunta 1 de 20</span>
+            <div class="barra-progresso"><div class="barra-progresso-preenchida" id="barra-progresso"></div></div>
+          </div>
+          <div class="placar-atual">
+            <span class="rotulo-placar">Pontos</span>
+            <span class="valor-placar" id="pontuacao-atual">0</span>
+          </div>
+        </div>
+
+        <div class="linha-meta">
+          <span class="badge badge-categoria" id="badge-categoria">Categoria</span>
+          <span class="badge" id="badge-dificuldade">Dificuldade</span>
+          <div class="timer" id="timer-container">
+            <svg viewBox="0 0 36 36" class="timer-anel">
+              <circle cx="18" cy="18" r="15.5" class="timer-trilha"></circle>
+              <circle cx="18" cy="18" r="15.5" class="timer-progresso" id="timer-circulo"></circle>
+            </svg>
+            <span id="timer-segundos">25</span>
+          </div>
+        </div>
+
+        <h2 class="enunciado" id="enunciado-pergunta">Carregando pergunta...</h2>
+
+        <div class="opcoes" id="lista-opcoes"></div>
+
+        <div class="feedback-resposta oculto" id="feedback-resposta">
+          <div class="feedback-cabecalho">
+            <span id="feedback-icone"></span>
+            <span id="feedback-titulo"></span>
+            <span class="feedback-pontos" id="feedback-pontos"></span>
+          </div>
+          <p class="feedback-explicacao" id="feedback-explicacao"></p>
+          <button class="botao botao-primario botao-bloco" id="botao-continuar">Continuar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ TELA 3 — RESULTADO ═══ -->
+    <section id="tela-resultado" class="tela-central oculto">
+      <div class="cartao cartao-resultado">
+        <div class="medalha" id="medalha-resultado">🏆</div>
+        <h1 class="titulo-resultado">Quiz finalizado!</h1>
+        <p class="texto-resultado" id="texto-nome-resultado"></p>
+
+        <div class="grade-resultado">
+          <div class="metrica">
+            <span class="metrica-valor" id="resultado-pontuacao">0</span>
+            <span class="metrica-rotulo">Pontos</span>
+          </div>
+          <div class="metrica metrica-destaque">
+            <span class="metrica-valor" id="resultado-posicao">—</span>
+            <span class="metrica-rotulo">Posição no ranking</span>
+          </div>
+          <div class="metrica">
+            <span class="metrica-valor" id="resultado-tempo">0s</span>
+            <span class="metrica-rotulo">Tempo total</span>
+          </div>
+        </div>
+
+        <a href="ranking.html" class="botao botao-primario botao-bloco">Ver ranking completo</a>
+        <p class="nota-rodape">Fique de olho no telão — o ranking é atualizado em tempo real durante todo o evento.</p>
+      </div>
+    </section>
+
+    <!-- ═══ TELA — JÁ PARTICIPOU / MENSAGEM ═══ -->
+    <section id="tela-mensagem" class="tela-central oculto">
+      <div class="cartao cartao-mensagem">
+        <div class="medalha" id="mensagem-icone">👋</div>
+        <h1 class="titulo-resultado" id="mensagem-titulo">Você já participou</h1>
+        <p class="texto-resultado" id="mensagem-texto"></p>
+        <a href="ranking.html" class="botao botao-primario botao-bloco">Ver ranking completo</a>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="tarjas-marca"><span></span><span></span><span></span></div>
+</div>
+
+<script src="assets/vendor/supabase-js.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/client.js"></script>
+<script src="js/quiz.js"></script>
+</body>
+</html>
