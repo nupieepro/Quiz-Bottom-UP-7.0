@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f0732">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel Admin — Quiz Bottom UP 7.0</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="tela-login" class="fundo-evento centro" style="min-height:100vh;">
+  <div class="cartao cartao-login">
+    <div class="lockup lockup-login">
+      <div class="selo-quadrado"><span>B</span></div>
+      <div>
+        <div class="marca-evento"><span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span></div>
+        <div class="subtitulo-evento">Painel administrativo</div>
+      </div>
+    </div>
+    <form id="form-login">
+      <div class="campo">
+        <label for="input-senha">Senha de admin</label>
+        <input id="input-senha" type="password" autocomplete="current-password" required>
+        <div class="erro-campo" id="erro-login"></div>
+      </div>
+      <button type="submit" class="botao botao-primario botao-bloco">Entrar</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ PAINEL ═══ -->
+<div id="painel-admin" class="oculto">
+  <header class="topo-admin">
+    <div class="lockup">
+      <div class="selo-quadrado"><span>B</span></div>
+      <div>
+        <div class="marca-evento"><span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span></div>
+        <div class="subtitulo-evento">Painel administrativo</div>
+      </div>
+    </div>
+    <button class="botao botao-fantasma" id="botao-sair">Sair</button>
+  </header>
+
+  <div id="aviso-senha-padrao" class="faixa-aviso oculto">
+    ⚠️ Você ainda está usando a senha padrão de instalação. <a href="#" data-ir-para="config">Troque agora</a> antes do evento.
+  </div>
+
+  <nav class="abas-admin">
+    <button class="aba-admin ativa" data-aba="perguntas">Perguntas</button>
+    <button class="aba-admin" data-aba="ranking">Ranking</button>
+    <button class="aba-admin" data-aba="config">Configurações</button>
+    <button class="aba-admin" data-aba="estatisticas">Estatísticas</button>
+  </nav>
+
+  <main class="corpo-admin">
+
+    <!-- ── PERGUNTAS ── -->
+    <section id="painel-perguntas" class="painel-aba">
+      <div class="barra-acoes">
+        <div>
+          <h2>Banco de perguntas</h2>
+          <p class="texto-secundario" id="resumo-perguntas">—</p>
+        </div>
+        <button class="botao botao-primario" id="botao-nova-pergunta">+ Nova pergunta</button>
+      </div>
+      <div id="lista-perguntas" class="lista-perguntas"></div>
+    </section>
+
+    <!-- ── RANKING ── -->
+    <section id="painel-ranking" class="painel-aba oculto">
+      <div class="barra-acoes">
+        <div>
+          <h2>Ranking</h2>
+          <p class="texto-secundario" id="resumo-ranking">—</p>
+        </div>
+        <button class="botao botao-perigo botao-sm" id="botao-resetar-ranking">Resetar ranking</button>
+      </div>
+      <div class="tabela-admin-wrap">
+        <table class="tabela-admin">
+          <thead><tr><th>#</th><th>Participante</th><th>Curso</th><th>Pontos</th><th>Tempo</th><th>Finalizado em</th></tr></thead>
+          <tbody id="corpo-tabela-admin-ranking"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── CONFIGURAÇÕES ── -->
+    <section id="painel-config" class="painel-aba oculto">
+      <h2>Configurações do quiz</h2>
+      <div class="cartao cartao-form">
+        <form id="form-config">
+          <div class="campo">
+            <label for="cfg-titulo">Título</label>
+            <input id="cfg-titulo" type="text" maxlength="120" required>
+          </div>
+          <div class="campo">
+            <label for="cfg-subtitulo">Subtítulo / tema</label>
+            <input id="cfg-subtitulo" type="text" maxlength="200" required>
+          </div>
+          <div class="grade-2">
+            <div class="campo">
+              <label for="cfg-tempo">Tempo por pergunta (segundos)</label>
+              <input id="cfg-tempo" type="number" min="5" max="300" required>
+            </div>
+            <div class="campo">
+              <label for="cfg-pontos">Pontos base por acerto</label>
+              <input id="cfg-pontos" type="number" min="1" required>
+            </div>
+          </div>
+          <label class="campo-toggle">
+            <input type="checkbox" id="cfg-ativo">
+            <span>Quiz ativo para participantes</span>
+          </label>
+          <button type="submit" class="botao botao-primario">Salvar configurações</button>
+        </form>
+      </div>
+
+      <h2 class="titulo-secao-espacada">Trocar senha de admin</h2>
+      <div class="cartao cartao-form">
+        <form id="form-senha">
+          <div class="grade-2">
+            <div class="campo">
+              <label for="nova-senha">Nova senha</label>
+              <input id="nova-senha" type="password" minlength="8" required>
+            </div>
+            <div class="campo">
+              <label for="confirmar-senha">Confirmar nova senha</label>
+              <input id="confirmar-senha" type="password" minlength="8" required>
+            </div>
+          </div>
+          <button type="submit" class="botao botao-secundario">Trocar senha</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ── ESTATÍSTICAS ── -->
+    <section id="painel-estatisticas" class="painel-aba oculto">
+      <h2>Estatísticas</h2>
+      <div class="grade-estatisticas" id="grade-estatisticas"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══ MODAL EDITOR DE PERGUNTA ═══ -->
+<div id="modal-pergunta" class="modal-fundo oculto">
+  <div class="modal-caixa">
+    <div class="modal-cabecalho">
+      <h3 id="modal-titulo">Nova pergunta</h3>
+      <button class="modal-fechar" id="botao-fechar-modal">&times;</button>
+    </div>
+    <form id="form-pergunta">
+      <input type="hidden" id="pg-id">
+
+      <div class="bloco-modo-texto">
+        <button type="button" class="botao botao-fantasma botao-sm" id="botao-mostrar-modo-texto">📋 Colar pergunta pronta (modo texto)</button>
+        <div id="area-modo-texto" class="oculto">
+          <div class="campo">
+            <textarea id="texto-colado" rows="9" placeholder="Qual é a capital do Brasil?
+a) São Paulo
+b) Brasília
+c) Rio de Janeiro
+d) Salvador
+Resposta: b
+Explicação: Brasília é a capital federal desde 1960.
+Categoria: geral
+Dificuldade: facil"></textarea>
+          </div>
+          <p class="dica-campo dica-modo-texto">
+            Cole o enunciado, uma alternativa por linha começando com a letra (a, b, c…), depois
+            <code>Resposta: &lt;letra&gt;</code>. <code>Explicação:</code>, <code>Categoria:</code> e <code>Dificuldade:</code> são opcionais.
+          </p>
+          <button type="button" class="botao botao-secundario botao-sm" id="botao-interpretar-texto">Preencher formulário com esse texto</button>
+        </div>
+      </div>
+
+      <div class="grade-2">
+        <div class="campo">
+          <label for="pg-categoria">Categoria</label>
+          <select id="pg-categoria" required>
+            <option value="operacoes">Operações</option>
+            <option value="logistica">Logística</option>
+            <option value="pesqop">Pesquisa Operacional</option>
+            <option value="qualidade">Qualidade</option>
+            <option value="produto">Produto</option>
+            <option value="organizacional">Organizacional</option>
+            <option value="economica">Econômica</option>
+            <option value="trabalho">Trabalho</option>
+            <option value="sustentabilidade">Sustentabilidade</option>
+            <option value="educacao">Tecnologia & Inovação</option>
+            <option value="geral">Geral</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="pg-dificuldade">Dificuldade</label>
+          <select id="pg-dificuldade" required>
+            <option value="facil">Fácil</option>
+            <option value="medio" selected>Médio</option>
+            <option value="dificil">Difícil</option>
+          </select>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="pg-enunciado">Enunciado</label>
+        <textarea id="pg-enunciado" maxlength="1000" required></textarea>
+      </div>
+      <div class="campo">
+        <label>Opções de resposta <span class="dica-campo">(marque a correta)</span></label>
+        <div id="lista-opcoes-editor"></div>
+        <button type="button" class="botao botao-fantasma botao-sm" id="botao-add-opcao">+ Adicionar opção</button>
+      </div>
+      <div class="campo">
+        <label for="pg-explicacao">Explicação (mostrada depois de responder)</label>
+        <textarea id="pg-explicacao" maxlength="600"></textarea>
+      </div>
+      <div class="grade-2">
+        <div class="campo">
+          <label for="pg-pontos">Pontos base <span class="dica-campo">(vazio = padrão)</span></label>
+          <input id="pg-pontos" type="number" min="1">
+        </div>
+        <label class="campo-toggle campo-toggle-modal">
+          <input type="checkbox" id="pg-ativa" checked>
+          <span>Pergunta ativa</span>
+        </label>
+      </div>
+      <div class="modal-rodape">
+        <button type="button" class="botao botao-fantasma" id="botao-cancelar-pergunta">Cancelar</button>
+        <button type="submit" class="botao botao-primario">Salvar pergunta</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="assets/vendor/supabase-js.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/client.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

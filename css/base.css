@@ -1,0 +1,252 @@
+/* ============================================================
+   QUIZ BOTTOM UP 7.0 — Base
+   Reset, tipografia, layout de página e componentes comuns
+   reaproveitados entre index / ranking / admin.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--fonte-corpo);
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--cream);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4 { font-family: var(--fonte-titulo); font-weight: 700; margin: 0; color: var(--ink); }
+p { margin: 0; }
+button { font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+::selection { background: var(--orange); color: #fff; }
+
+/* ── Fundo decorativo (folhas/trigo estilizados, tema do evento) ── */
+.fundo-evento {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: var(--cream);
+}
+.fundo-evento::before,
+.fundo-evento::after {
+  content: '';
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  background: radial-gradient(circle at 30% 30%, var(--orange-2) 0%, transparent 70%);
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+}
+.fundo-evento::before { top: -120px; right: -100px; }
+.fundo-evento::after { bottom: -140px; left: -120px; background: radial-gradient(circle at 60% 60%, var(--gold) 0%, transparent 70%); }
+
+/* ── Wordmark do evento ── */
+.marca-evento {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  line-height: 0.85;
+  user-select: none;
+}
+.marca-evento .b1 {
+  font-family: var(--fonte-display);
+  font-weight: 400;
+  font-size: 1em;
+  color: var(--navy);
+  letter-spacing: 0.01em;
+}
+.marca-evento .b2 {
+  font-family: var(--fonte-titulo);
+  font-weight: 800;
+  font-size: 1em;
+  color: var(--orange);
+  letter-spacing: -0.01em;
+}
+.marca-evento .b3 {
+  font-family: var(--fonte-mono);
+  font-weight: 600;
+  font-size: 0.32em;
+  color: var(--gold);
+  background: var(--navy);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  transform: translateY(-0.6em);
+}
+.marca-evento--claro .b1 { color: var(--white); }
+.marca-evento--claro .b2 { color: var(--orange-2); }
+
+.selo-quadrado {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(155deg, var(--orange) 0%, var(--orange-bright) 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--sombra-laranja);
+  flex-shrink: 0;
+}
+.selo-quadrado span {
+  font-family: var(--fonte-display);
+  color: #fff;
+  font-size: 22px;
+  transform: translateY(1px);
+}
+
+/* ── Cabeçalho comum ── */
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding: var(--s5) var(--s6);
+  position: relative;
+  z-index: 1;
+}
+.topo .lockup { display: flex; align-items: center; gap: var(--s3); }
+.topo .subtitulo-evento {
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ── Cartão ── */
+.cartao {
+  background: var(--card-bg);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sombra-md);
+  padding: var(--s8);
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Botões ── */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  border: none;
+  border-radius: var(--r-full);
+  padding: 14px 28px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform var(--transicao-rapida), box-shadow var(--transicao-rapida), background var(--transicao-rapida), opacity var(--transicao-rapida);
+  font-family: var(--fonte-titulo);
+}
+.botao:disabled { opacity: 0.5; cursor: not-allowed; }
+.botao-primario {
+  background: linear-gradient(135deg, var(--orange) 0%, var(--orange-bright) 100%);
+  color: #fff;
+  box-shadow: var(--sombra-laranja);
+}
+.botao-primario:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 16px 34px var(--orange-glow); }
+.botao-primario:not(:disabled):active { transform: translateY(0); }
+.botao-secundario {
+  background: transparent;
+  color: var(--navy);
+  border: 2px solid var(--navy);
+}
+.botao-secundario:not(:disabled):hover { background: var(--navy); color: #fff; }
+.botao-perigo { background: var(--erro); color: #fff; }
+.botao-perigo:not(:disabled):hover { filter: brightness(1.08); }
+.botao-fantasma { background: transparent; color: var(--ink-soft); padding: 10px 16px; }
+.botao-fantasma:hover { color: var(--ink); }
+.botao-bloco { width: 100%; }
+.botao-sm { padding: 9px 18px; font-size: 13px; }
+
+/* ── Formulário ── */
+.campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--s5); }
+.campo label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.campo input, .campo select, .campo textarea {
+  border: 2px solid var(--border-soft);
+  border-radius: var(--r-md);
+  padding: 13px 16px;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--cream-2);
+  transition: border-color var(--transicao-rapida), background var(--transicao-rapida);
+  outline: none;
+}
+.campo input:focus, .campo select:focus, .campo textarea:focus {
+  border-color: var(--orange);
+  background: #fff;
+}
+.campo .erro-campo { font-size: 12.5px; color: var(--erro-texto); font-weight: 600; min-height: 16px; }
+.campo textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+
+/* ── Badges / pílulas ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.badge-facil { background: var(--sucesso-bg); color: var(--sucesso-texto); }
+.badge-medio { background: var(--aviso-bg); color: var(--aviso-texto); }
+.badge-dificil { background: var(--erro-bg); color: var(--erro-texto); }
+.badge-categoria { color: #fff; }
+
+/* ── Toast ── */
+#toast-container {
+  position: fixed; top: 20px; right: 20px; z-index: 1000;
+  display: flex; flex-direction: column; gap: 10px;
+  max-width: min(90vw, 380px);
+}
+.toast {
+  background: var(--navy);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: var(--r-md);
+  box-shadow: var(--sombra-lg);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex; align-items: center; gap: 10px;
+  animation: toast-in 0.25s ease;
+  border-left: 4px solid var(--orange);
+}
+.toast.sucesso { border-left-color: var(--sucesso); }
+.toast.erro { border-left-color: var(--erro); }
+@keyframes toast-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ── Loading ── */
+.spinner {
+  width: 22px; height: 22px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+.spinner-navy { border-color: var(--border-soft); border-top-color: var(--orange); }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* ── Utilidades ── */
+.centro { display: flex; align-items: center; justify-content: center; }
+.somente-leitor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.oculto { display: none !important; }
+
+/* ── Rodapé de marca (3 tarjas de cor, igual identidade visual) ── */
+.tarjas-marca { display: flex; height: 6px; width: 100%; }
+.tarjas-marca span { flex: 1; }
+.tarjas-marca span:nth-child(1) { background: var(--orange); }
+.tarjas-marca span:nth-child(2) { background: var(--navy); }
+.tarjas-marca span:nth-child(3) { background: var(--gold); }
+
+@media (max-width: 640px) {
+  .cartao { padding: var(--s5); border-radius: var(--r-md); }
+  .topo { padding: var(--s4); }
+}

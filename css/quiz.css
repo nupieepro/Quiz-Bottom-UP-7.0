@@ -1,0 +1,107 @@
+/* ============================================================
+   QUIZ BOTTOM UP 7.0 — Telas do participante (index.html)
+   ============================================================ */
+
+.conteudo-quiz {
+  position: relative;
+  z-index: 1;
+  padding: var(--s4) var(--s4) var(--s16);
+  display: flex;
+  justify-content: center;
+}
+.tela-central { width: 100%; max-width: 560px; margin-top: var(--s6); }
+
+/* ── Identificação ── */
+.cartao-identificacao { text-align: left; }
+.etiqueta-topo { margin-bottom: var(--s4); background: var(--cream-2); color: var(--orange); }
+.titulo-hero {
+  font-size: clamp(28px, 6vw, 38px);
+  line-height: 1.08;
+  margin-bottom: var(--s3);
+}
+.destaque-laranja { color: var(--orange); }
+.texto-intro { color: var(--ink-soft); font-size: 15px; line-height: 1.55; margin-bottom: var(--s6); }
+
+/* ── Quiz ── */
+.cartao-quiz { padding: var(--s6); }
+.cabecalho-quiz { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); margin-bottom: var(--s5); }
+.progresso-info { flex: 1; }
+.progresso-info span { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+.barra-progresso { height: 6px; background: var(--border-soft); border-radius: var(--r-full); margin-top: 6px; overflow: hidden; }
+.barra-progresso-preenchida { height: 100%; background: linear-gradient(90deg, var(--orange) 0%, var(--gold) 100%); border-radius: var(--r-full); transition: width var(--transicao-base); }
+.placar-atual { text-align: right; }
+.rotulo-placar { display: block; font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; }
+.valor-placar { font-family: var(--fonte-mono); font-size: 22px; font-weight: 700; color: var(--navy); }
+
+.linha-meta { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s5); }
+.linha-meta .badge-dificuldade,
+#badge-dificuldade { background: var(--cream-2); color: var(--ink-soft); }
+.linha-meta { position: relative; }
+
+.timer { margin-left: auto; position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+.timer-anel { width: 44px; height: 44px; transform: rotate(-90deg); position: absolute; inset: 0; }
+.timer-trilha { fill: none; stroke: var(--border-soft); stroke-width: 3; }
+.timer-progresso {
+  fill: none; stroke: var(--orange); stroke-width: 3; stroke-linecap: round;
+  stroke-dasharray: 97.4; stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+}
+.timer-progresso.tempo-critico { stroke: var(--erro); }
+#timer-segundos { font-family: var(--fonte-mono); font-size: 13px; font-weight: 700; color: var(--ink); position: relative; z-index: 1; }
+
+.enunciado { font-size: clamp(19px, 3.6vw, 23px); line-height: 1.35; margin-bottom: var(--s6); }
+
+.opcoes { display: flex; flex-direction: column; gap: var(--s3); }
+.opcao {
+  display: flex; align-items: center; gap: var(--s3);
+  text-align: left;
+  border: 2px solid var(--border-soft);
+  background: var(--cream-2);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color var(--transicao-rapida), background var(--transicao-rapida), transform var(--transicao-rapida);
+}
+.opcao:hover:not(:disabled) { border-color: var(--orange-2); background: #fff; transform: translateX(2px); }
+.opcao:disabled { cursor: default; }
+.opcao .letra-opcao {
+  width: 30px; height: 30px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--border-medium);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--fonte-mono); font-weight: 700; font-size: 13px; color: var(--ink-soft);
+}
+.opcao.selecionada { border-color: var(--navy); background: #fff; }
+.opcao.selecionada .letra-opcao { background: var(--navy); border-color: var(--navy); color: #fff; }
+.opcao.correta { border-color: var(--sucesso); background: var(--sucesso-bg); }
+.opcao.correta .letra-opcao { background: var(--sucesso); border-color: var(--sucesso); color: #fff; }
+.opcao.incorreta { border-color: var(--erro); background: var(--erro-bg); }
+.opcao.incorreta .letra-opcao { background: var(--erro); border-color: var(--erro); color: #fff; }
+
+.feedback-resposta { margin-top: var(--s6); padding-top: var(--s5); border-top: 2px dashed var(--border-soft); }
+.feedback-cabecalho { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s3); }
+#feedback-titulo { font-weight: 800; font-size: 17px; }
+.feedback-pontos { margin-left: auto; font-family: var(--fonte-mono); font-weight: 700; color: var(--orange); }
+.feedback-explicacao { color: var(--ink-soft); font-size: 14.5px; line-height: 1.55; margin-bottom: var(--s5); }
+
+/* ── Resultado / mensagem ── */
+.cartao-resultado, .cartao-mensagem { text-align: center; }
+.medalha { font-size: 56px; margin-bottom: var(--s3); }
+.titulo-resultado { font-size: 26px; margin-bottom: var(--s2); }
+.texto-resultado { color: var(--ink-soft); font-size: 15px; margin-bottom: var(--s6); }
+.grade-resultado { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s3); margin-bottom: var(--s8); }
+.metrica { background: var(--cream-2); border-radius: var(--r-md); padding: var(--s4) var(--s2); }
+.metrica-destaque { background: linear-gradient(155deg, var(--navy) 0%, var(--navy-2) 100%); }
+.metrica-destaque .metrica-valor { color: var(--orange-2); }
+.metrica-destaque .metrica-rotulo { color: var(--on-navy-soft); }
+.metrica-valor { display: block; font-family: var(--fonte-mono); font-size: 24px; font-weight: 700; color: var(--navy); }
+.metrica-rotulo { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.03em; }
+.nota-rodape { margin-top: var(--s5); font-size: 13px; color: var(--ink-faint); }
+
+@media (max-width: 480px) {
+  .grade-resultado { grid-template-columns: 1fr; }
+}

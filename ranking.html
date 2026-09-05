@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f0732">
+<meta name="description" content="Ranking ao vivo do Quiz Bottom UP 7.0.">
+<title>Ranking ao vivo — Quiz Bottom UP 7.0</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/ranking.css">
+</head>
+<body class="corpo-ranking">
+
+<div class="palco-ranking">
+  <header class="topo topo-ranking">
+    <div class="lockup">
+      <div class="selo-quadrado"><span>B</span></div>
+      <div>
+        <div class="marca-evento marca-evento--claro">
+          <span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span>
+        </div>
+        <div class="subtitulo-evento subtitulo-claro">Ranking ao vivo do Quiz</div>
+      </div>
+    </div>
+    <div class="indicador-vivo">
+      <span class="ponto-vivo"></span> AO VIVO
+      <span class="separador">·</span>
+      <span id="total-participantes">0</span> participantes
+    </div>
+  </header>
+
+  <main class="miolo-ranking">
+    <div id="podio" class="podio"></div>
+    <div id="lista-vazia" class="estado-vazio oculto">
+      <p>Ainda não há ninguém no ranking.</p>
+      <p class="estado-vazio-sub">Seja o primeiro a completar o quiz e aparecer aqui!</p>
+    </div>
+    <div class="tabela-ranking-wrap">
+      <table class="tabela-ranking" id="tabela-ranking">
+        <thead>
+          <tr><th>#</th><th>Participante</th><th>Curso</th><th>Pontos</th><th>Tempo</th></tr>
+        </thead>
+        <tbody id="corpo-tabela-ranking"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="assets/vendor/supabase-js.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/client.js"></script>
+<script src="js/ranking.js"></script>
+</body>
+</html>
