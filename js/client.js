@@ -3,6 +3,25 @@
 const QuizClient = (() => {
   const sb = window.supabase.createClient(window.QUIZ_SUPABASE_URL, window.QUIZ_SUPABASE_ANON_KEY);
 
+  // Diferença entre o relógio do servidor e o deste aparelho. Nunca
+  // comparamos prazo_fim direto com Date.now() — se o relógio do
+  // celular/notebook estiver errado (fuso trocado, hora manualmente
+  // errada, etc.), qualquer prazo pareceria já vencido e uma sessão
+  // ao vivo inteira correria sozinha em segundos. corrigirRelogio()
+  // recalibra esse offset a cada resposta de obter_estado_sessao.
+  let offsetRelogioMs = 0;
+
+  function corrigirRelogio(timestampServidor) {
+    if (!timestampServidor) return;
+    const servidorMs = new Date(timestampServidor).getTime();
+    if (Number.isNaN(servidorMs)) return;
+    offsetRelogioMs = servidorMs - Date.now();
+  }
+
+  function agoraCorrigido() {
+    return Date.now() + offsetRelogioMs;
+  }
+
   async function rpc(nome, params = {}) {
     const { data, error } = await sb.rpc(nome, params);
     if (error) throw new Error(traduzirErro(error.message));
@@ -17,7 +36,7 @@ const QuizClient = (() => {
     return msg;
   }
 
-  return { sb, rpc };
+  return { sb, rpc, corrigirRelogio, agoraCorrigido };
 })();
 
 // ── Toast ──

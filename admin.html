@@ -85,7 +85,7 @@
           <button class="botao botao-perigo" id="botao-encerrar-sessao" disabled>Encerrar quiz</button>
           <button class="botao botao-fantasma botao-sm" id="botao-reiniciar-sessao">Voltar para a sala de espera</button>
         </div>
-        <p class="dica-campo dica-sessao">Depois de iniciar, o quiz avança sozinho a cada 20s — pra todo mundo ao mesmo tempo, inclusive nesta tela. "Adiantar agora" é só um atalho manual, opcional. "Voltar para a sala de espera" reinicia a sessão do zero sem apagar os pontos já registrados — use só se precisar corrigir algo antes do quiz de verdade começar.</p>
+        <p class="dica-campo dica-sessao">Depois de iniciar, o quiz avança sozinho a cada 20s — pra todo mundo ao mesmo tempo, inclusive nesta tela. "Adiantar agora" é só um atalho manual, opcional. "Voltar para a sala de espera" reinicia a sessão do zero <strong>sem apagar</strong> os pontos já registrados — use só se precisar corrigir algo antes do quiz de verdade começar. Pra apagar tudo e reaplicar o quiz num evento futuro (zerar participantes e ranking), use "Resetar quiz" na aba <strong>Ranking</strong>.</p>
       </div>
     </section>
 
@@ -114,9 +114,10 @@
         </div>
         <div class="botoes-sessao">
           <button class="botao botao-secundario botao-sm" id="botao-exportar-csv">⬇ Exportar CSV</button>
-          <button class="botao botao-perigo botao-sm" id="botao-resetar-ranking">Resetar ranking</button>
+          <button class="botao botao-perigo botao-sm" id="botao-resetar-ranking">🗑 Resetar quiz (apagar tudo)</button>
         </div>
       </div>
+      <p class="dica-campo dica-sessao">"Resetar quiz" apaga todos os participantes, respostas e o ranking, e devolve a sessão pro início — use pra reaplicar o quiz num evento futuro do zero. As perguntas cadastradas <strong>não</strong> são apagadas.</p>
       <div class="tabela-admin-wrap">
         <table class="tabela-admin">
           <thead><tr><th>#</th><th>Participante</th><th>Curso</th><th>Pontos</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead>

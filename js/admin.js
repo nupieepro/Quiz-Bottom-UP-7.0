@@ -94,12 +94,16 @@
   // (ex.: todo mundo já respondeu e dá pra adiantar).
   const ESTADO_SESSAO_LABEL = { aguardando: 'Aguardando', ativa: 'Ao vivo', finalizada: 'Encerrada' };
   const INTERVALO_TICK_SESSAO_MS = 1000;
+  const MINIMO_MS_POR_PERGUNTA = 3000;
   estado.sessaoInfo = null;
   estado.avancando = false;
+  estado.ultimoNumeroVisto = null;
+  estado.numeroAtualDesde = null; // performance.now() de quando a pergunta atual apareceu
 
   async function carregarSessao() {
     try {
       const dados = await QuizClient.rpc('obter_estado_sessao');
+      QuizClient.corrigirRelogio(dados.agora);
       estado.sessaoInfo = dados;
       atualizarPainelSessao(dados);
     } catch (erro) {
@@ -113,7 +117,11 @@
     badge.className = `badge badge-sessao-${dados.estado}`;
 
     if (dados.estado === 'ativa') {
-      const restanteSeg = Math.max(0, Math.ceil((new Date(dados.prazo_fim).getTime() - Date.now()) / 1000));
+      if (dados.numero !== estado.ultimoNumeroVisto) {
+        estado.ultimoNumeroVisto = dados.numero;
+        estado.numeroAtualDesde = performance.now();
+      }
+      const restanteSeg = Math.max(0, Math.ceil((new Date(dados.prazo_fim).getTime() - QuizClient.agoraCorrigido()) / 1000));
       el('sessao-info-pergunta').textContent = `Pergunta ${dados.numero} de ${dados.total_perguntas} · ${dados.respondidas} resposta(s) recebida(s) · próxima em ${restanteSeg}s`;
     } else if (dados.estado === 'finalizada') {
       el('sessao-info-pergunta').textContent = `${dados.total_perguntas} perguntas — quiz encerrado.`;
@@ -142,8 +150,15 @@
   function tickSessao() {
     const info = estado.sessaoInfo;
     if (!info || info.estado !== 'ativa' || !info.prazo_fim) return;
-    const restanteMs = new Date(info.prazo_fim).getTime() - Date.now();
-    if (restanteMs <= 0) { avancarPergunta(); return; }
+    const restanteMs = new Date(info.prazo_fim).getTime() - QuizClient.agoraCorrigido();
+    if (restanteMs <= 0) {
+      // trava de segurança: mesmo com o relógio corrigido, nunca deixa
+      // avançar mais rápido que isso — se algo ainda assim tentar
+      // "correr" pelas perguntas, essa trava segura o estrago.
+      const decorridoMs = estado.numeroAtualDesde === null ? Infinity : performance.now() - estado.numeroAtualDesde;
+      if (decorridoMs >= MINIMO_MS_POR_PERGUNTA) avancarPergunta();
+      return;
+    }
     // atualiza só a contagem regressiva, sem bater no servidor de novo
     const restanteSeg = Math.ceil(restanteMs / 1000);
     el('sessao-info-pergunta').textContent = `Pergunta ${info.numero} de ${info.total_perguntas} · ${info.respondidas} resposta(s) recebida(s) · próxima em ${restanteSeg}s`;
@@ -635,12 +650,13 @@
   });
 
   el('botao-resetar-ranking').addEventListener('click', async () => {
-    if (!confirm('Isso vai apagar TODOS os participantes, tentativas e respostas registradas até agora. Confirma o reset?')) return;
+    if (!confirm('Isso vai apagar TODOS os participantes, respostas e o ranking, e devolver a sessão pro início — use pra reaplicar o quiz num evento futuro. As perguntas cadastradas continuam intactas. Confirma o reset?')) return;
     if (!confirm('Tem certeza mesmo? Essa ação é irreversível.')) return;
     try {
       await rpcAdmin('admin_resetar_ranking');
-      mostrarToast('Ranking resetado.', 'sucesso');
+      mostrarToast('Quiz resetado — pronto pra rodar do zero de novo.', 'sucesso');
       await carregarRanking();
+      await carregarSessao();
     } catch (erro) { mostrarToast(erro.message, 'erro'); }
   });
 
