@@ -30,7 +30,7 @@
   const CIRCUNFERENCIA = 2 * Math.PI * 15.5;
   const CHAVE_TENTATIVA = 'quizbu_tentativa_id';
   const CHAVE_NOME = 'quizbu_nome';
-  const INTERVALO_POLL_MS = 2000;
+  const INTERVALO_POLL_MS = 1200;
   const INTERVALO_TICK_MS = 200;
 
   const telas = {
@@ -126,6 +126,19 @@
     sincronizarEstado();
     estado.pollTimer = setInterval(sincronizarEstado, INTERVALO_POLL_MS);
   }
+
+  // Celular trava a tela ou o navegador manda a aba pra segundo plano →
+  // o setInterval do poll fica pausado/lento pelo próprio sistema, e o
+  // participante pode voltar vendo uma pergunta que já não existe mais
+  // (admin encerrou ou avançou enquanto a tela estava apagada). Assim
+  // que a aba volta a ficar visível/em foco, força uma sincronização
+  // imediata em vez de esperar o próximo tick do poll.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && estado.pollTimer) sincronizarEstado();
+  });
+  window.addEventListener('focus', () => {
+    if (estado.pollTimer) sincronizarEstado();
+  });
 
   function pararRelogios() {
     if (estado.pollTimer) clearInterval(estado.pollTimer);
@@ -261,8 +274,17 @@
       estado.pontuacaoAtual = resp.pontuacao_total;
       exibirFeedback(resp, opcaoId);
     } catch (erro) {
-      mostrarToast(erro.message, 'erro');
-      exibirAguardandoAvanco('⚠️', 'Não foi possível registrar', 'Aguardando a próxima pergunta...');
+      // Se o servidor rejeitou porque a sessão já não está mais ativa
+      // (admin encerrou, ou já avançou pra outra pergunta), não faz
+      // sentido esperar o próximo poll — sincroniza na hora pra sair
+      // dessa tela imediatamente, em vez de deixar os botões "mortos"
+      // até 1.2s depois.
+      if (/encerrad|não há pergunta ativa|tempo esgotado/i.test(erro.message)) {
+        sincronizarEstado();
+      } else {
+        mostrarToast(erro.message, 'erro');
+        exibirAguardandoAvanco('⚠️', 'Não foi possível registrar', 'Aguardando a próxima pergunta...');
+      }
     }
   }
 
