@@ -5,11 +5,19 @@
 .conteudo-quiz {
   position: relative;
   z-index: 1;
-  padding: var(--s4) var(--s4) var(--s16);
+  flex: 1;
+  padding: var(--s6) var(--s4);
   display: flex;
   justify-content: center;
+  align-items: center;
+  /* "safe center": centraliza verticalmente quando sobra espaço (tela
+     de espera, mensagens curtas), mas nunca corta o topo de telas com
+     mais conteúdo (pergunta com várias alternativas) — cai pra
+     alinhamento no topo nesse caso. Navegadores sem suporte a "safe"
+     ignoram esta linha e ficam só com align-items:center acima. */
+  align-items: safe center;
 }
-.tela-central { width: 100%; max-width: 560px; margin-top: var(--s6); }
+.tela-central { width: 100%; max-width: 560px; }
 
 /* ── Identificação ── */
 .cartao-identificacao { text-align: left; }

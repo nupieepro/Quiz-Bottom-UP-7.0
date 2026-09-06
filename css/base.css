@@ -26,6 +26,8 @@ a { color: inherit; }
 /* ── Fundo decorativo (folhas/trigo estilizados, tema do evento) ── */
 .fundo-evento {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow-x: hidden;
   background: var(--cream);
