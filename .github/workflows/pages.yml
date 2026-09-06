@@ -28,6 +28,22 @@ jobs:
           mkdir _site
           cp -r index.html ranking.html admin.html telao.html 404.html robots.txt css js assets _site/
 
+      - name: Carimbar versão nos arquivos CSS/JS (cache-busting)
+        run: |
+          # Sem isso, navegador/CDN podem servir uma versão em cache do
+          # CSS/JS depois de um deploy novo, obrigando quem acessa a
+          # limpar cache ou abrir aba anônima pra ver a atualização.
+          # Anexando ?v=<commit> em cada referência, um F5 normal já
+          # busca os arquivos certos a cada novo deploy.
+          VERSAO="${GITHUB_SHA::8}"
+          for arquivo in _site/*.html; do
+            sed -i -E \
+              -e "s#(href=\"css/[^\"]+\.css)\"#\1?v=${VERSAO}\"#g" \
+              -e "s#(src=\"js/[^\"]+\.js)\"#\1?v=${VERSAO}\"#g" \
+              -e "s#(src=\"assets/vendor/[^\"]+\.js)\"#\1?v=${VERSAO}\"#g" \
+              "$arquivo"
+          done
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
