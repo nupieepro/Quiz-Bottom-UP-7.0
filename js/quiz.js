@@ -159,8 +159,26 @@
         await exibirResultadoFinal();
       }
     } catch (erro) {
-      console.error('Falha ao sincronizar com a sessão:', erro.message);
+      // O organizador usou "Resetar quiz" pra reaplicar o evento e essa
+      // aba ficou aberta desde a rodada anterior: a tentativa antiga foi
+      // apagada do banco. Em vez de travar em silêncio numa tela morta,
+      // manda a pessoa se identificar de novo pra rodada nova.
+      if (/tentativa não encontrada/i.test(erro.message || '')) {
+        reiniciarParaNovaIdentificacao();
+      } else {
+        console.error('Falha ao sincronizar com a sessão:', erro.message);
+      }
     }
+  }
+
+  function reiniciarParaNovaIdentificacao() {
+    pararRelogios();
+    sessionStorage.removeItem(CHAVE_TENTATIVA);
+    sessionStorage.removeItem(CHAVE_NOME);
+    estado.tentativaId = null;
+    estado.numeroPerguntaExibida = null;
+    mostrarTela('identificacao');
+    mostrarToast('O organizador reiniciou o quiz — identifique-se novamente pra participar da nova rodada.', 'erro');
   }
 
   function aplicarPerguntaAtiva(dados) {
@@ -279,7 +297,9 @@
       // sentido esperar o próximo poll — sincroniza na hora pra sair
       // dessa tela imediatamente, em vez de deixar os botões "mortos"
       // até 1.2s depois.
-      if (/encerrad|não há pergunta ativa|tempo esgotado/i.test(erro.message)) {
+      if (/tentativa não encontrada/i.test(erro.message)) {
+        reiniciarParaNovaIdentificacao();
+      } else if (/encerrad|não há pergunta ativa|tempo esgotado/i.test(erro.message)) {
         sincronizarEstado();
       } else {
         mostrarToast(erro.message, 'erro');
