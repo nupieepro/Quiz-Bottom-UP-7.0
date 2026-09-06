@@ -26,7 +26,7 @@ jobs:
       - name: Preparar site (sem arquivos de banco de dados)
         run: |
           mkdir _site
-          cp -r index.html ranking.html admin.html telao.html css js assets _site/
+          cp -r index.html ranking.html admin.html telao.html 404.html robots.txt css js assets _site/
 
       - uses: actions/configure-pages@v5
 
