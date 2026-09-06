@@ -37,6 +37,14 @@ python3 -m http.server 8000
 # depois abra http://localhost:8000
 ```
 
+## Publicação (GitHub Pages)
+
+O site vai ao ar automaticamente em **https://nupieepro.github.io/Quiz-Bottom-UP-7.0/** a cada push no `main`, via `.github/workflows/pages.yml` (GitHub Actions → GitHub Pages). O workflow publica só os arquivos do app (`index.html`, `ranking.html`, `admin.html`, `telao.html`, `css/`, `js/`, `assets/`), sem expor `supabase/` nem este README.
+
+- Participante: `https://nupieepro.github.io/Quiz-Bottom-UP-7.0/`
+- Telão: `https://nupieepro.github.io/Quiz-Bottom-UP-7.0/telao.html`
+- Admin: `https://nupieepro.github.io/Quiz-Bottom-UP-7.0/admin.html`
+
 ## Backend (Supabase)
 
 O projeto já vem conectado a um projeto Supabase dedicado (`quiz-bottom-up-7-0`, plano gratuito). As credenciais (URL + anon key) estão em `js/config.js` — **isso é intencional e seguro**: a anon key não dá acesso direto a nenhuma tabela.
