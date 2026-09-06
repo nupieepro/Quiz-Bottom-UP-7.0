@@ -153,6 +153,9 @@
     if (dados.numero !== estado.numeroPerguntaExibida) {
       estado.numeroPerguntaExibida = dados.numero;
       estado.respondida = false;
+      estado.cliquei = false;
+      estado.questaoAtualId = dados.pergunta.id;
+      estado.gabaritoRevelado = false;
       estado.prazoFim = new Date(dados.prazo_fim).getTime();
       estado.tempoLimiteMs = dados.tempo_por_pergunta_seg * 1000;
       renderizarPergunta(dados);
@@ -206,6 +209,25 @@
       });
       exibirAguardandoAvanco('⏱️', 'Tempo esgotado', 'O organizador vai avançar em instantes.');
     }
+    if (restanteMs <= 0 && !estado.cliquei && !estado.gabaritoRevelado) {
+      revelarGabaritoSemResposta();
+    }
+  }
+
+  // Quem não respondeu a tempo também merece ver qual era a certa —
+  // isso não vem mais do telão (que só mostra o ranking), então cada
+  // celular resolve sozinho assim que o servidor confirmar o prazo.
+  async function revelarGabaritoSemResposta() {
+    try {
+      const gabarito = await QuizClient.rpc('obter_gabarito_atual');
+      if (gabarito.questao_id !== estado.questaoAtualId) return;
+      estado.gabaritoRevelado = true;
+      document.querySelectorAll('.opcao').forEach((btn) => {
+        if (btn.dataset.id === gabarito.resposta_correta) btn.classList.add('correta');
+      });
+    } catch (_) {
+      // servidor ainda não confirmou o fim do prazo — tenta de novo no próximo tick
+    }
   }
 
   function atualizarTimerVisual(restanteMs) {
@@ -220,6 +242,7 @@
   async function responderPergunta(questaoId, opcaoId) {
     if (estado.respondida) return;
     estado.respondida = true;
+    estado.cliquei = true;
 
     const tempoGastoMs = estado.tempoLimiteMs ? (estado.tempoLimiteMs - Math.max(0, estado.prazoFim - Date.now())) : 0;
     document.querySelectorAll('.opcao').forEach((btn) => {

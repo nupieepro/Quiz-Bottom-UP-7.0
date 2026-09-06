@@ -19,7 +19,7 @@
 
 <div class="palco-ranking palco-telao">
 
-  <!-- ═══ AGUARDANDO ═══ -->
+  <!-- ═══ AGUARDANDO O INÍCIO ═══ -->
   <section id="telao-aguardando" class="tela-telao">
     <div class="marca-evento marca-evento--claro marca-telao">
       <span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span>
@@ -28,47 +28,23 @@
     <div class="cartao-aguardando">
       <span class="ponto-vivo"></span>
       <h1>Aguardando o início do quiz</h1>
-      <p>Acesse pelo celular e se identifique — o quiz começa quando o organizador der o start.</p>
+      <p>Acesse pelo celular e se identifique — o quiz começa quando o organizador der o start. As perguntas aparecem no seu celular; aqui no telão você acompanha o ranking ao vivo.</p>
       <p class="url-acesso" id="url-acesso"></p>
     </div>
   </section>
 
-  <!-- ═══ PERGUNTA ATIVA ═══ -->
-  <section id="telao-pergunta" class="tela-telao oculto">
-    <header class="topo-telao">
+  <!-- ═══ RANKING AO VIVO (durante e depois do quiz) ═══ -->
+  <section id="telao-ranking" class="tela-telao oculto tela-ranking-telao">
+    <header class="topo topo-ranking">
       <div class="marca-evento marca-evento--claro">
         <span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span>
       </div>
-      <div class="progresso-telao">
-        <span id="telao-progresso">Pergunta 1 de 20</span>
-        <span class="separador">·</span>
-        <span id="telao-respondidas">0 respostas</span>
+      <div class="indicador-vivo" id="telao-indicador">
+        <span class="ponto-vivo" id="telao-ponto-vivo"></span>
+        <span id="telao-indicador-texto">AO VIVO</span>
       </div>
     </header>
-
-    <div class="timer-telao">
-      <svg viewBox="0 0 36 36" class="timer-anel-telao">
-        <circle cx="18" cy="18" r="15.5" class="timer-trilha"></circle>
-        <circle cx="18" cy="18" r="15.5" class="timer-progresso-telao" id="telao-timer-circulo"></circle>
-      </svg>
-      <span id="telao-timer-segundos">25</span>
-    </div>
-
-    <div class="badges-telao">
-      <span class="badge badge-categoria" id="telao-badge-categoria">Categoria</span>
-      <span class="badge" id="telao-badge-dificuldade">Dificuldade</span>
-    </div>
-
-    <h1 class="enunciado-telao" id="telao-enunciado">Carregando pergunta...</h1>
-    <div class="opcoes-telao" id="telao-opcoes"></div>
-  </section>
-
-  <!-- ═══ FINALIZADO ═══ -->
-  <section id="telao-finalizado" class="tela-telao oculto">
-    <div class="marca-evento marca-evento--claro marca-telao-final">
-      <span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span>
-    </div>
-    <h1 class="titulo-final">🏆 Ranking final</h1>
+    <h1 class="titulo-final" id="telao-titulo-ranking">Ranking ao vivo</h1>
     <main class="miolo-ranking miolo-telao">
       <div id="podio" class="podio"></div>
       <div class="tabela-ranking-wrap">

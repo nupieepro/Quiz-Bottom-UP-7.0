@@ -395,23 +395,114 @@
     } catch (erro) { mostrarToast(erro.message, 'erro'); }
   });
 
-  // ══════════════════ RANKING ══════════════════
+  // ══════════════════ RANKING / PARTICIPANTES ══════════════════
+  let participantesAtuais = [];
+
   async function carregarRanking() {
     try {
-      const linhas = await QuizClient.rpc('ranking_publico', { p_limite: 300 });
-      el('resumo-ranking').textContent = `${linhas.length} participante(s) finalizaram o quiz.`;
-      el('corpo-tabela-admin-ranking').innerHTML = linhas.map((l) => `
-        <tr>
+      participantesAtuais = await rpcAdmin('admin_listar_participantes');
+      const ocultos = participantesAtuais.filter((p) => p.oculto_ranking).length;
+      el('resumo-ranking').textContent = `${participantesAtuais.length} participante(s)` + (ocultos ? ` · ${ocultos} oculto(s) do ranking público` : '');
+      el('corpo-tabela-admin-ranking').innerHTML = participantesAtuais.map((l) => `
+        <tr class="${l.oculto_ranking ? 'linha-oculta' : ''}">
           <td>${l.posicao}º</td>
           <td>${escaparHtml(l.nome)} ${escaparHtml(l.sobrenome)}</td>
           <td>${escaparHtml(l.curso)}</td>
           <td>${l.pontuacao}</td>
           <td>${Math.round(l.tempo_total_ms / 1000)}s</td>
-          <td>${new Date(l.finalizada_em).toLocaleString('pt-BR')}</td>
+          <td>${l.oculto_ranking ? '<span class="badge" style="background:#eee;color:#888">Oculto</span>' : (l.finalizada_em ? '<span class="badge badge-facil">Finalizou</span>' : '<span class="badge">Em andamento</span>')}</td>
+          <td class="item-pergunta-acoes">
+            <button class="icone-acao" data-editar-participante="${l.participante_id}" title="Editar">✏️</button>
+            <button class="icone-acao" data-alternar-oculto="${l.tentativa_id}:${!l.oculto_ranking}" title="${l.oculto_ranking ? 'Mostrar no ranking' : 'Ocultar do ranking'}">${l.oculto_ranking ? '👁️' : '🚫'}</button>
+            <button class="icone-acao perigo" data-excluir-participante="${l.participante_id}" title="Excluir">🗑️</button>
+          </td>
         </tr>
-      `).join('') || '<tr><td colspan="6" class="texto-secundario">Ninguém finalizou o quiz ainda.</td></tr>';
+      `).join('') || '<tr><td colspan="7" class="texto-secundario">Ninguém entrou no quiz ainda.</td></tr>';
+
+      document.querySelectorAll('[data-editar-participante]').forEach((b) => b.addEventListener('click', () => abrirModalParticipante(b.dataset.editarParticipante)));
+      document.querySelectorAll('[data-alternar-oculto]').forEach((b) => b.addEventListener('click', () => {
+        const [tentativaId, novoOculto] = b.dataset.alternarOculto.split(':');
+        alternarOcultoRanking(tentativaId, novoOculto === 'true');
+      }));
+      document.querySelectorAll('[data-excluir-participante]').forEach((b) => b.addEventListener('click', () => excluirParticipante(b.dataset.excluirParticipante)));
     } catch (erro) { mostrarToast(erro.message, 'erro'); }
   }
+
+  async function alternarOcultoRanking(tentativaId, oculto) {
+    try {
+      await rpcAdmin('admin_alternar_oculto_ranking', { p_tentativa_id: tentativaId, p_oculto: oculto });
+      await carregarRanking();
+    } catch (erro) { mostrarToast(erro.message, 'erro'); }
+  }
+
+  async function excluirParticipante(participanteId) {
+    if (!confirm('Excluir este participante e todas as respostas dele permanentemente? Essa ação não pode ser desfeita.')) return;
+    try {
+      await rpcAdmin('admin_excluir_participante', { p_participante_id: participanteId });
+      mostrarToast('Participante excluído.', 'sucesso');
+      await carregarRanking();
+    } catch (erro) { mostrarToast(erro.message, 'erro'); }
+  }
+
+  function abrirModalParticipante(participanteId) {
+    const p = participantesAtuais.find((x) => x.participante_id === participanteId);
+    if (!p) return;
+    el('pt-participante-id').value = p.participante_id;
+    el('pt-tentativa-id').value = p.tentativa_id;
+    el('pt-nome').value = p.nome;
+    el('pt-sobrenome').value = p.sobrenome;
+    el('pt-curso').value = p.curso;
+    el('pt-pontuacao').value = p.pontuacao;
+    el('pt-tempo').value = Math.round(p.tempo_total_ms / 1000);
+    el('modal-participante').classList.remove('oculto');
+  }
+
+  function fecharModalParticipante() { el('modal-participante').classList.add('oculto'); }
+  el('botao-fechar-modal-participante').addEventListener('click', fecharModalParticipante);
+  el('botao-cancelar-participante').addEventListener('click', fecharModalParticipante);
+  el('modal-participante').addEventListener('click', (ev) => { if (ev.target.id === 'modal-participante') fecharModalParticipante(); });
+
+  el('form-participante').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    try {
+      await rpcAdmin('admin_editar_participante', {
+        p_participante_id: el('pt-participante-id').value,
+        p_nome: el('pt-nome').value.trim(),
+        p_sobrenome: el('pt-sobrenome').value.trim(),
+        p_curso: el('pt-curso').value.trim(),
+        p_pontuacao: Number(el('pt-pontuacao').value),
+        p_tempo_total_ms: Math.round(Number(el('pt-tempo').value) * 1000),
+      });
+      mostrarToast('Participante atualizado.', 'sucesso');
+      fecharModalParticipante();
+      await carregarRanking();
+    } catch (erro) { mostrarToast(erro.message, 'erro'); }
+  });
+
+  function exportarCsv() {
+    const cabecalho = ['Posição', 'Nome', 'Sobrenome', 'Curso', 'Pontos', 'Tempo (s)', 'Finalizado em', 'Oculto do ranking'];
+    const linhas = participantesAtuais.map((l) => [
+      l.posicao, l.nome, l.sobrenome, l.curso, l.pontuacao,
+      Math.round(l.tempo_total_ms / 1000),
+      l.finalizada_em ? new Date(l.finalizada_em).toLocaleString('pt-BR') : '',
+      l.oculto_ranking ? 'Sim' : 'Não',
+    ]);
+    const csvEscapar = (v) => `"${String(v).replace(/"/g, '""')}"`;
+    const csv = [cabecalho, ...linhas].map((linha) => linha.map(csvEscapar).join(';')).join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ranking-bottomup7-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+  el('botao-exportar-csv').addEventListener('click', () => {
+    if (!participantesAtuais.length) return mostrarToast('Nenhum participante pra exportar ainda.', 'erro');
+    exportarCsv();
+  });
 
   el('botao-resetar-ranking').addEventListener('click', async () => {
     if (!confirm('Isso vai apagar TODOS os participantes, tentativas e respostas registradas até agora. Confirma o reset?')) return;

@@ -108,11 +108,14 @@
           <h2>Ranking</h2>
           <p class="texto-secundario" id="resumo-ranking">—</p>
         </div>
-        <button class="botao botao-perigo botao-sm" id="botao-resetar-ranking">Resetar ranking</button>
+        <div class="botoes-sessao">
+          <button class="botao botao-secundario botao-sm" id="botao-exportar-csv">⬇ Exportar CSV</button>
+          <button class="botao botao-perigo botao-sm" id="botao-resetar-ranking">Resetar ranking</button>
+        </div>
       </div>
       <div class="tabela-admin-wrap">
         <table class="tabela-admin">
-          <thead><tr><th>#</th><th>Participante</th><th>Curso</th><th>Pontos</th><th>Tempo</th><th>Finalizado em</th></tr></thead>
+          <thead><tr><th>#</th><th>Participante</th><th>Curso</th><th>Pontos</th><th>Tempo</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody id="corpo-tabela-admin-ranking"></tbody>
         </table>
       </div>
@@ -260,6 +263,49 @@ Dificuldade: facil"></textarea>
       <div class="modal-rodape">
         <button type="button" class="botao botao-fantasma" id="botao-cancelar-pergunta">Cancelar</button>
         <button type="submit" class="botao botao-primario">Salvar pergunta</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ MODAL EDITOR DE PARTICIPANTE ═══ -->
+<div id="modal-participante" class="modal-fundo oculto">
+  <div class="modal-caixa">
+    <div class="modal-cabecalho">
+      <h3>Editar participante</h3>
+      <button class="modal-fechar" id="botao-fechar-modal-participante">&times;</button>
+    </div>
+    <form id="form-participante">
+      <input type="hidden" id="pt-participante-id">
+      <input type="hidden" id="pt-tentativa-id">
+      <div class="grade-2">
+        <div class="campo">
+          <label for="pt-nome">Nome</label>
+          <input id="pt-nome" type="text" maxlength="60" required>
+        </div>
+        <div class="campo">
+          <label for="pt-sobrenome">Sobrenome</label>
+          <input id="pt-sobrenome" type="text" maxlength="60" required>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="pt-curso">Curso</label>
+        <input id="pt-curso" type="text" maxlength="80" required>
+      </div>
+      <div class="grade-2">
+        <div class="campo">
+          <label for="pt-pontuacao">Pontos</label>
+          <input id="pt-pontuacao" type="number" min="0" required>
+        </div>
+        <div class="campo">
+          <label for="pt-tempo">Tempo total (segundos)</label>
+          <input id="pt-tempo" type="number" min="0" required>
+        </div>
+      </div>
+      <p class="dica-campo">Ajustar pontos/tempo aqui é manual — use só pra corrigir um problema técnico pontual durante o evento.</p>
+      <div class="modal-rodape">
+        <button type="button" class="botao botao-fantasma" id="botao-cancelar-participante">Cancelar</button>
+        <button type="submit" class="botao botao-primario">Salvar alterações</button>
       </div>
     </form>
   </div>
