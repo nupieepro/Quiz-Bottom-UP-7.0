@@ -103,11 +103,22 @@
       document.getElementById('lobby-nome').textContent = (resultado.nome || nome).split(' ')[0];
       iniciarSincronizacao();
     } catch (erro) {
-      mostrarToast(erro.message, 'erro');
+      if (/encerrado/i.test(erro.message)) {
+        exibirMensagemFinal('🔒', 'Quiz encerrado', erro.message);
+      } else {
+        mostrarToast(erro.message, 'erro');
+      }
     } finally {
       alternarCarregamento(false);
     }
   });
+
+  function exibirMensagemFinal(icone, titulo, texto) {
+    document.getElementById('mensagem-icone').textContent = icone;
+    document.getElementById('mensagem-titulo').textContent = titulo;
+    document.getElementById('mensagem-texto').textContent = texto;
+    mostrarTela('mensagem');
+  }
 
   // ── Sincronização com a sessão ao vivo ──
   function iniciarSincronizacao() {
@@ -131,7 +142,6 @@
       } else if (dados.estado === 'ativa') {
         aplicarPerguntaAtiva(dados);
       } else if (dados.estado === 'finalizada') {
-        pararRelogios();
         await exibirResultadoFinal();
       }
     } catch (erro) {
@@ -255,8 +265,12 @@
   }
 
   // ── Tela 3: resultado ──
+  // Só para os relógios depois que o resultado carrega de verdade: uma
+  // falha de rede bem no instante da finalização não pode travar o
+  // participante numa tela sem resultado e sem novas tentativas de sync.
   async function exibirResultadoFinal() {
     const resultado = await QuizClient.rpc('obter_meu_resultado', { p_tentativa_id: estado.tentativaId });
+    pararRelogios();
     const nome = sessionStorage.getItem(CHAVE_NOME) || 'Participante';
     document.getElementById('texto-nome-resultado').textContent = `Parabéns, ${nome.split(' ')[0]}! Este foi o seu desempenho:`;
     document.getElementById('resultado-pontuacao').textContent = resultado.pontuacao;
