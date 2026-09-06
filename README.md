@@ -1,6 +1,6 @@
 # Quiz Bottom UP 7.0
 
-Quiz oficial do evento **Bottom UP 7.0** (Nupieepro) — *"Inovação que transforma: tecnologia, pessoas e sustentabilidade"*. Vinte perguntas de Engenharia de Produção, sessão ao vivo controlada pelo admin (tipo Kahoot), ranking em tempo real e um painel administrativo completo para editar tudo sem tocar em código.
+Quiz oficial do evento **Bottom UP 7.0** (Nupieepro) — *"Inovação que transforma: tecnologia, pessoas e sustentabilidade"*. Dez perguntas de Engenharia, sessão ao vivo que avança sozinha (tipo Kahoot), ranking em tempo real e um painel administrativo completo para editar tudo sem tocar em código.
 
 Site estático (HTML/CSS/JS puro, sem build) + Supabase como backend, seguindo o mesmo padrão dos outros sistemas do Nupieepro.
 
@@ -10,10 +10,10 @@ O quiz é uma **sessão única e sincronizada**, não algo que cada participante
 
 1. O organizador abre `admin.html` → aba **Sessão ao vivo** e `telao.html` numa segunda tela/aba, projetada para o público.
 2. Os participantes acessam `index.html` pelo celular, se identificam e caem numa sala de espera.
-3. O organizador clica **Iniciar quiz** — todo mundo recebe a mesma pergunta, com o mesmo prazo, ao mesmo tempo. O prazo é controlado pelo servidor, não pelo relógio de cada celular. A pergunta em si só aparece no celular de cada participante; o **telão mostra só o ranking ao vivo**, atualizando sozinho a cada resposta — assim ninguém "cola" olhando a tela de outra pessoa, e o telão vira um placar contínuo em vez de ficar trocando de tela a cada pergunta.
+3. O organizador clica **Iniciar quiz** — todo mundo recebe a mesma pergunta, com o mesmo prazo de **20 segundos**, ao mesmo tempo. O prazo é controlado pelo servidor, não pelo relógio de cada celular. A pergunta em si só aparece no celular de cada participante; o **telão mostra só o ranking ao vivo**, atualizando sozinho a cada resposta — assim ninguém "cola" olhando a tela de outra pessoa, e o telão vira um placar contínuo em vez de ficar trocando de tela a cada pergunta.
 4. Quem não responder a tempo vê a resposta certa destacada no próprio celular assim que o prazo acaba (o servidor libera o gabarito só depois de confirmar que o tempo encerrou).
-5. O organizador clica **Próxima pergunta** para avançar — isso é repetido até a última pergunta, ou ele pode **Encerrar quiz** a qualquer momento.
-6. Ao encerrar, celulares e telão mostram o ranking final automaticamente.
+5. Passados os 20s, **o quiz avança sozinho para a próxima pergunta — em todos os celulares ao mesmo tempo, inclusive na tela do organizador** (o painel admin tem seu próprio relógio e chama o avanço automaticamente; o botão "Adiantar agora" é só um atalho manual opcional, ex.: quando todo mundo já respondeu). Isso se repete até a última pergunta, ou o organizador pode **Encerrar quiz** a qualquer momento.
+6. Ao encerrar (automaticamente após a última pergunta, ou manualmente), celulares e telão mostram o ranking final.
 
 ## Estrutura
 
@@ -74,7 +74,7 @@ Identidade visual herdada do Nupieepro e do material oficial do Bottom UP 7.0: a
 
 ## Perguntas
 
-O banco tem 20 perguntas de Engenharia em geral (não só Produção), conceituais e alinhadas ao tema do evento — "Inovação que transforma: tecnologia, pessoas e sustentabilidade" —, com dificuldade acessível (a maioria fácil/médio) e **nenhuma exige cálculo pra responder**. Tudo — enunciado, opções, resposta certa, explicação, dificuldade, pontuação e ordem — é editável pelo painel admin, sem precisar mexer no banco.
+O banco tem 10 perguntas de Engenharia em geral (não só Produção), conceituais e alinhadas ao tema do evento — "Inovação que transforma: tecnologia, pessoas e sustentabilidade" — e **nenhuma exige cálculo pra responder**. São 5 fáceis, 3 médias e 2 difíceis, em ordem crescente de dificuldade, cada nível valendo mais pontos que o anterior (ver "Pontuação e ranking" abaixo). Tudo — enunciado, opções, resposta certa, explicação, dificuldade, pontuação e ordem — é editável pelo painel admin, sem precisar mexer no banco.
 
 No editor de perguntas (`admin.html` → **+ Nova pergunta** ou ✏️ numa existente) tem um **modo texto**: em vez de preencher campo por campo, dá pra colar tudo de uma vez nesse formato e clicar em "Preencher formulário":
 
@@ -103,7 +103,16 @@ Esse fluxo é pensado pra quem prefere revisar/escrever as perguntas num editor 
 
 ## Pontuação e ranking
 
-Cada acerto vale entre 50% e 100% dos pontos base da pergunta, proporcional à velocidade da resposta (responder rápido vale mais). O desempate no ranking é pelo tempo total de resposta. Cada participante (identificado por nome + sobrenome + curso) entra uma única vez na sessão; fechar e reabrir a página a qualquer momento resincroniza automaticamente com a pergunta que estiver ativa. Depois que o organizador encerra o quiz, novas identificações são recusadas até a próxima sessão (**Resetar ranking**, no admin).
+O quiz vale **no máximo 1000 pontos no total** — esse teto só é alcançado acertando tudo instantaneamente. Cada pergunta tem um valor base conforme a dificuldade, crescente:
+
+| Dificuldade | Perguntas | Pontos por pergunta | Subtotal |
+|---|---|---|---|
+| Fácil | 5 | 40 | 200 |
+| Médio | 3 | 100 | 300 |
+| Difícil | 2 | 250 | 500 |
+| **Total** | **10** | | **1000** |
+
+Cada acerto vale entre 50% e 100% dos pontos base da pergunta, proporcional à velocidade da resposta (responder rápido vale mais; errar vale 0). O desempate no ranking é pelo tempo total de resposta. Cada participante (identificado por nome + sobrenome + curso) entra uma única vez na sessão; fechar e reabrir a página a qualquer momento resincroniza automaticamente com a pergunta que estiver ativa. Depois que o organizador encerra o quiz, novas identificações são recusadas até a próxima sessão (**Resetar ranking**, no admin).
 
 Na aba **Ranking** do admin dá pra gerenciar os participantes individualmente, sem precisar resetar tudo:
 
