@@ -78,4 +78,11 @@
 @media (max-width: 640px) {
   .podio { grid-template-columns: 1fr; }
   .lugar-podio.ouro, .lugar-podio.prata, .lugar-podio.bronze { order: 0; padding-top: var(--s5); }
+  /* A tabela (4º em diante) tem mais colunas do que cabe na tela do
+     celular — o degradê na borda avisa que dá pra arrastar pro lado
+     em vez de simplesmente cortar a coluna de tempo. */
+  .tabela-ranking-wrap {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%);
+  }
 }

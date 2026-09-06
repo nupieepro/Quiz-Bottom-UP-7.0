@@ -85,8 +85,13 @@
     `).join('');
   }
 
-  sincronizarEstado();
-  sincronizarRanking();
+  // sincronizarEstado() é assíncrona; chamar sincronizarRanking() logo
+  // em seguida (sem esperar) rodava com estado.telaAtual ainda nulo e
+  // sempre pulava a primeira renderização — o telão ficava com o
+  // pódio/tabela vazios por até um ciclo inteiro de polling depois de
+  // entrar no ar. Encadeando com .then() garantimos a primeira
+  // renderização já com dado de verdade.
+  sincronizarEstado().then(sincronizarRanking);
   setInterval(sincronizarEstado, INTERVALO_ESTADO_MS);
   setInterval(sincronizarRanking, INTERVALO_RANKING_MS);
 })();
