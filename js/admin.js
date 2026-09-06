@@ -330,6 +330,97 @@
     mostrarToast(resultado.avisoResposta || 'Formulário preenchido — confira os campos e clique em Salvar.', resultado.avisoResposta ? 'erro' : 'sucesso');
   });
 
+  // ── Exportar / importar o banco inteiro como um documento de texto ──
+  // Pensado pra quem prefere revisar/escrever as perguntas fora do
+  // sistema (Word, bloco de notas) e trazer tudo de volta de uma vez.
+  function construirBlocoTexto(p) {
+    const linhasOpcoes = p.opcoes.map((o, i) => `${LETRAS[i]}) ${o.texto}`).join('\n');
+    const idxCorreta = p.opcoes.findIndex((o) => o.id === p.resposta_correta);
+    const letraCorreta = LETRAS[idxCorreta >= 0 ? idxCorreta : 0];
+    let bloco = `${p.enunciado}\n${linhasOpcoes}\nResposta: ${letraCorreta}`;
+    if (p.explicacao) bloco += `\nExplicação: ${p.explicacao}`;
+    bloco += `\nCategoria: ${p.categoria}`;
+    bloco += `\nDificuldade: ${p.dificuldade}`;
+    return bloco;
+  }
+
+  el('botao-exportar-perguntas').addEventListener('click', () => {
+    if (!estado.perguntas.length) return mostrarToast('Nenhuma pergunta pra exportar ainda.', 'erro');
+    const texto = estado.perguntas.map(construirBlocoTexto).join('\n\n---\n\n');
+    const blob = new Blob([texto], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `perguntas-bottomup7-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  el('botao-abrir-importar-perguntas').addEventListener('click', () => {
+    el('texto-importar-perguntas').value = '';
+    el('arquivo-importar-perguntas').value = '';
+    el('erros-importar-perguntas').classList.add('oculto');
+    el('modal-importar-perguntas').classList.remove('oculto');
+  });
+
+  function fecharModalImportar() { el('modal-importar-perguntas').classList.add('oculto'); }
+  el('botao-fechar-modal-importar').addEventListener('click', fecharModalImportar);
+  el('botao-cancelar-importar').addEventListener('click', fecharModalImportar);
+  el('modal-importar-perguntas').addEventListener('click', (ev) => { if (ev.target.id === 'modal-importar-perguntas') fecharModalImportar(); });
+
+  el('arquivo-importar-perguntas').addEventListener('change', async (ev) => {
+    const arquivo = ev.target.files[0];
+    if (!arquivo) return;
+    el('texto-importar-perguntas').value = await arquivo.text();
+  });
+
+  function mostrarErrosImportacao(erros) {
+    const el2 = el('erros-importar-perguntas');
+    if (!erros.length) { el2.classList.add('oculto'); el2.innerHTML = ''; return; }
+    el2.innerHTML = `<strong>${erros.length} problema(s) encontrado(s) — corrija e tente de novo:</strong><ul>${erros.map((e) => `<li>${escaparHtml(e)}</li>`).join('')}</ul>`;
+    el2.classList.remove('oculto');
+  }
+
+  el('botao-processar-importar').addEventListener('click', async () => {
+    const bruto = el('texto-importar-perguntas').value;
+    if (!bruto.trim()) return mostrarToast('Cole ou carregue o documento com as perguntas primeiro.', 'erro');
+
+    const blocos = bruto.split(/\r?\n[ \t]*-{3,}[ \t]*\r?\n/).map((b) => b.trim()).filter((b) => b.length > 0);
+    if (!blocos.length) return mostrarToast('Não encontrei nenhuma pergunta no texto.', 'erro');
+
+    const erros = [];
+    const perguntas = [];
+    blocos.forEach((bloco, i) => {
+      const resultado = interpretarTextoColado(bloco);
+      if (resultado.erro) { erros.push(`Pergunta ${i + 1}: ${resultado.erro}`); return; }
+      if (resultado.avisoResposta) { erros.push(`Pergunta ${i + 1}: ${resultado.avisoResposta}`); return; }
+      perguntas.push({
+        enunciado: resultado.enunciado,
+        opcoes: resultado.opcoes.map((texto, idx) => ({ id: LETRAS[idx], texto })),
+        resposta_correta: LETRAS[resultado.correctIndex],
+        explicacao: resultado.explicacao || null,
+        categoria: resultado.categoria || 'geral',
+        dificuldade: resultado.dificuldade || 'medio',
+      });
+    });
+
+    mostrarErrosImportacao(erros);
+    if (erros.length) return;
+
+    if (!confirm(`Isso vai substituir TODAS as ${estado.perguntas.length} perguntas atuais por estas ${perguntas.length} novas. Confirma?`)) return;
+
+    try {
+      const total = await rpcAdmin('admin_importar_perguntas', { p_perguntas: perguntas });
+      mostrarToast(`${total} pergunta(s) importada(s) com sucesso.`, 'sucesso');
+      fecharModalImportar();
+      await carregarPerguntas();
+    } catch (erro) {
+      mostrarErrosImportacao([erro.message]);
+    }
+  });
+
   function fecharModal() { el('modal-pergunta').classList.add('oculto'); }
   el('botao-fechar-modal').addEventListener('click', fecharModal);
   el('botao-cancelar-pergunta').addEventListener('click', fecharModal);

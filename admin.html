@@ -96,7 +96,11 @@
           <h2>Banco de perguntas</h2>
           <p class="texto-secundario" id="resumo-perguntas">—</p>
         </div>
-        <button class="botao botao-primario" id="botao-nova-pergunta">+ Nova pergunta</button>
+        <div class="botoes-sessao">
+          <button class="botao botao-secundario botao-sm" id="botao-exportar-perguntas">⬇ Exportar tudo (.txt)</button>
+          <button class="botao botao-secundario botao-sm" id="botao-abrir-importar-perguntas">⬆ Importar em lote</button>
+          <button class="botao botao-primario" id="botao-nova-pergunta">+ Nova pergunta</button>
+        </div>
       </div>
       <div id="lista-perguntas" class="lista-perguntas"></div>
     </section>
@@ -265,6 +269,43 @@ Dificuldade: facil"></textarea>
         <button type="submit" class="botao botao-primario">Salvar pergunta</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ═══ MODAL IMPORTAR PERGUNTAS EM LOTE ═══ -->
+<div id="modal-importar-perguntas" class="modal-fundo oculto">
+  <div class="modal-caixa modal-caixa-larga">
+    <div class="modal-cabecalho">
+      <h3>Importar perguntas em lote</h3>
+      <button class="modal-fechar" id="botao-fechar-modal-importar">&times;</button>
+    </div>
+    <p class="texto-secundario">
+      Cole aqui o documento com todas as perguntas (ou carregue o arquivo .txt exportado), edite o que quiser e clique em "Processar e importar". Isso <strong>substitui todo o banco de perguntas atual</strong>. Cada pergunta segue o mesmo formato do modo texto, separadas por uma linha só com <code>---</code>:
+    </p>
+    <pre class="exemplo-importacao">Qual é a capital do Brasil?
+a) São Paulo
+b) Brasília
+c) Rio de Janeiro
+d) Salvador
+Resposta: b
+Explicação: Brasília é a capital federal desde 1960.
+Categoria: geral
+Dificuldade: facil
+
+---
+
+Próxima pergunta aqui...</pre>
+    <div class="campo">
+      <input type="file" id="arquivo-importar-perguntas" accept=".txt">
+    </div>
+    <div class="campo">
+      <textarea id="texto-importar-perguntas" rows="14" placeholder="Cole aqui o documento com todas as perguntas..."></textarea>
+    </div>
+    <div id="erros-importar-perguntas" class="lista-erros-importacao oculto"></div>
+    <div class="modal-rodape">
+      <button type="button" class="botao botao-fantasma" id="botao-cancelar-importar">Cancelar</button>
+      <button type="button" class="botao botao-primario" id="botao-processar-importar">Processar e importar</button>
+    </div>
   </div>
 </div>
 
