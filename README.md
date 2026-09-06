@@ -56,6 +56,8 @@ Todo acesso ao banco passa por **funções RPC** (`security definer`), documenta
 
 O prazo de cada pergunta (`prazo_fim`) é calculado pelo servidor a partir do momento em que o admin ativou aquela pergunta — o client nunca decide sozinho quando o tempo acaba, só espelha a contagem regressiva. O gabarito só é liberado (`obter_gabarito_atual`) depois que o próprio servidor confirma que o prazo já passou; quem responde vê na hora pela própria resposta, e quem não responde a tempo vê o destaque da opção certa no próprio celular assim que o prazo fecha.
 
+`obter_estado_sessao` também devolve o horário do próprio servidor (`agora`), e todo lugar que decide "o prazo já venceu?" (inclusive o avanço automático do admin) calibra um offset contra esse horário em vez de confiar direto no relógio do aparelho — um notebook/celular com a hora errada não derruba mais a sessão inteira. Como camada extra de segurança, o avanço automático nunca troca de pergunta antes de 3 segundos reais desde que ela apareceu, não importa o que o cálculo do relógio diga.
+
 Nenhuma tabela (`questions`, `participantes`, `tentativas`, `respostas`, `admin_auth`, `admin_sessions`) libera `SELECT`/`INSERT`/`UPDATE` direto para o anon key — só `EXECUTE` nas funções acima. Isso significa que **a resposta certa nunca trafega para o navegador antes de o participante responder**, e a pontuação é sempre calculada e gravada pelo servidor (impossível de forjar pelo DevTools).
 
 Para aplicar as migrations num novo projeto Supabase, rode os arquivos de `supabase/migrations/` em ordem no SQL Editor (ou via `supabase db push` se preferir o CLI).
@@ -112,9 +114,11 @@ O quiz vale **no máximo 1000 pontos no total** — esse teto só é alcançado 
 | Difícil | 2 | 250 | 500 |
 | **Total** | **10** | | **1000** |
 
-Cada acerto vale entre 50% e 100% dos pontos base da pergunta, proporcional à velocidade da resposta (responder rápido vale mais; errar vale 0). O desempate no ranking é pelo tempo total de resposta. Cada participante (identificado por nome + sobrenome + curso) entra uma única vez na sessão; fechar e reabrir a página a qualquer momento resincroniza automaticamente com a pergunta que estiver ativa. Depois que o organizador encerra o quiz, novas identificações são recusadas até a próxima sessão (**Resetar ranking**, no admin).
+Cada acerto vale entre 50% e 100% dos pontos base da pergunta, proporcional à velocidade da resposta (responder rápido vale mais; errar vale 0). O desempate no ranking é pelo tempo total de resposta. Cada participante (identificado por nome + sobrenome + curso) entra uma única vez na sessão; fechar e reabrir a página a qualquer momento resincroniza automaticamente com a pergunta que estiver ativa. Depois que o organizador encerra o quiz, novas identificações são recusadas até a próxima sessão (**Resetar quiz**, no admin).
 
-Na aba **Ranking** do admin dá pra gerenciar os participantes individualmente, sem precisar resetar tudo:
+Na aba **Ranking** do admin tem o botão **🗑 Resetar quiz (apagar tudo)** — apaga todos os participantes, respostas e o ranking e devolve a sessão pro início, pra reaplicar o quiz do zero num evento futuro (as perguntas cadastradas não são afetadas).
+
+Também dá pra gerenciar os participantes individualmente, sem precisar resetar tudo:
 
 - **✏️ Editar** — corrige nome/sobrenome/curso digitados errado, ou ajusta pontuação/tempo manualmente (só pra corrigir um problema técnico pontual durante o evento).
 - **🚫/👁️ Ocultar do ranking** — some da tela pública (telão, `ranking.html` e da tela de resultado dos participantes) sem apagar nada — útil pra um teste ou uma inscrição duplicada.

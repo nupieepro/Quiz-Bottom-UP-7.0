@@ -137,6 +137,7 @@
   async function sincronizarEstado() {
     try {
       const dados = await QuizClient.rpc('obter_estado_sessao');
+      QuizClient.corrigirRelogio(dados.agora);
       if (dados.estado === 'aguardando') {
         mostrarTela('lobby');
       } else if (dados.estado === 'ativa') {
@@ -199,7 +200,7 @@
   }
 
   function tick() {
-    const restanteMs = Math.max(0, estado.prazoFim - Date.now());
+    const restanteMs = Math.max(0, estado.prazoFim - QuizClient.agoraCorrigido());
     atualizarTimerVisual(restanteMs);
     if (restanteMs <= 0 && !estado.respondida) {
       estado.respondida = true;
@@ -244,7 +245,7 @@
     estado.respondida = true;
     estado.cliquei = true;
 
-    const tempoGastoMs = estado.tempoLimiteMs ? (estado.tempoLimiteMs - Math.max(0, estado.prazoFim - Date.now())) : 0;
+    const tempoGastoMs = estado.tempoLimiteMs ? (estado.tempoLimiteMs - Math.max(0, estado.prazoFim - QuizClient.agoraCorrigido())) : 0;
     document.querySelectorAll('.opcao').forEach((btn) => {
       btn.disabled = true;
       if (btn.dataset.id === opcaoId) btn.classList.add('selecionada');
