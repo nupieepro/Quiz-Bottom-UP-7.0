@@ -106,7 +106,7 @@ a { color: inherit; }
   position: relative;
   z-index: 1;
 }
-.topo .lockup { display: flex; align-items: center; gap: var(--s3); }
+.lockup { display: flex; align-items: center; gap: var(--s3); }
 .topo .subtitulo-evento {
   font-size: 12px;
   color: var(--ink-soft);
