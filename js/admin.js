@@ -14,6 +14,7 @@
     perguntas: [],
     opcoesEditor: [],
     correctIndex: 0,
+    pollSessao: null,
   };
 
   const el = (id) => document.getElementById(id);
@@ -32,6 +33,7 @@
   function encerrarSessao(msg) {
     sessionStorage.removeItem(CHAVE_TOKEN);
     estado.token = null;
+    if (estado.pollSessao) { clearInterval(estado.pollSessao); estado.pollSessao = null; }
     el('painel-admin').classList.add('oculto');
     el('tela-login').classList.remove('oculto');
     if (msg) mostrarToast(msg, 'erro');
@@ -61,7 +63,8 @@
   async function abrirPainel() {
     el('tela-login').classList.add('oculto');
     el('painel-admin').classList.remove('oculto');
-    await Promise.all([carregarConfig(), carregarPerguntas()]);
+    await Promise.all([carregarConfig(), carregarPerguntas(), carregarSessao()]);
+    if (!estado.pollSessao) estado.pollSessao = setInterval(carregarSessao, 2500);
   }
 
   // ── Abas ──
@@ -79,6 +82,49 @@
     if (nome === 'ranking') carregarRanking();
     if (nome === 'estatisticas') carregarEstatisticas();
   }
+
+  // ══════════════════ SESSÃO AO VIVO ══════════════════
+  const ESTADO_SESSAO_LABEL = { aguardando: 'Aguardando', ativa: 'Ao vivo', finalizada: 'Encerrada' };
+
+  async function carregarSessao() {
+    try {
+      const dados = await QuizClient.rpc('obter_estado_sessao');
+      const badge = el('sessao-badge-estado');
+      badge.textContent = ESTADO_SESSAO_LABEL[dados.estado] || dados.estado;
+      badge.className = `badge badge-sessao-${dados.estado}`;
+
+      el('sessao-info-pergunta').textContent = dados.estado === 'ativa'
+        ? `Pergunta ${dados.numero} de ${dados.total_perguntas} · ${dados.respondidas} resposta(s) recebida(s)`
+        : dados.estado === 'finalizada'
+          ? `${dados.total_perguntas} perguntas — quiz encerrado.`
+          : `${dados.total_perguntas} perguntas cadastradas, prontas pra começar.`;
+
+      el('botao-iniciar-sessao').disabled = dados.estado !== 'aguardando';
+      el('botao-proxima-pergunta').disabled = dados.estado !== 'ativa';
+      el('botao-encerrar-sessao').disabled = dados.estado !== 'ativa';
+    } catch (erro) {
+      console.error('Falha ao carregar sessão:', erro.message);
+    }
+  }
+
+  el('botao-iniciar-sessao').addEventListener('click', async () => {
+    try { await rpcAdmin('admin_iniciar_sessao'); mostrarToast('Quiz iniciado! Todo mundo já vê a primeira pergunta.', 'sucesso'); await carregarSessao(); }
+    catch (erro) { mostrarToast(erro.message, 'erro'); }
+  });
+  el('botao-proxima-pergunta').addEventListener('click', async () => {
+    try { await rpcAdmin('admin_proxima_pergunta'); await carregarSessao(); }
+    catch (erro) { mostrarToast(erro.message, 'erro'); }
+  });
+  el('botao-encerrar-sessao').addEventListener('click', async () => {
+    if (!confirm('Encerrar o quiz agora? O ranking final fica disponível pra todo mundo.')) return;
+    try { await rpcAdmin('admin_encerrar_sessao'); mostrarToast('Quiz encerrado.', 'sucesso'); await carregarSessao(); }
+    catch (erro) { mostrarToast(erro.message, 'erro'); }
+  });
+  el('botao-reiniciar-sessao').addEventListener('click', async () => {
+    if (!confirm('Voltar todo mundo pra sala de espera? Os pontos já feitos continuam valendo — só a sessão volta ao início.')) return;
+    try { await rpcAdmin('admin_reiniciar_sessao'); mostrarToast('Sessão reiniciada.', 'sucesso'); await carregarSessao(); }
+    catch (erro) { mostrarToast(erro.message, 'erro'); }
+  });
 
   // ══════════════════ PERGUNTAS ══════════════════
   async function carregarPerguntas() {

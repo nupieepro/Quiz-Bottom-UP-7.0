@@ -1,17 +1,29 @@
 # Quiz Bottom UP 7.0
 
-Quiz oficial do evento **Bottom UP 7.0** (Nupieepro) — *"Inovação que transforma: tecnologia, pessoas e sustentabilidade"*. Vinte perguntas de Engenharia de Produção, ranking ao vivo por acerto + velocidade, e um painel administrativo completo para editar tudo sem tocar em código.
+Quiz oficial do evento **Bottom UP 7.0** (Nupieepro) — *"Inovação que transforma: tecnologia, pessoas e sustentabilidade"*. Vinte perguntas de Engenharia de Produção, sessão ao vivo controlada pelo admin (tipo Kahoot), ranking em tempo real e um painel administrativo completo para editar tudo sem tocar em código.
 
 Site estático (HTML/CSS/JS puro, sem build) + Supabase como backend, seguindo o mesmo padrão dos outros sistemas do Nupieepro.
+
+## Como funciona no dia do evento
+
+O quiz é uma **sessão única e sincronizada**, não algo que cada participante faz no próprio ritmo:
+
+1. O organizador abre `admin.html` → aba **Sessão ao vivo** e `telao.html` numa segunda tela/aba, projetada para o público.
+2. Os participantes acessam `index.html` pelo celular, se identificam e caem numa sala de espera.
+3. O organizador clica **Iniciar quiz** — todo mundo (celulares + telão) recebe a mesma pergunta, com o mesmo prazo, ao mesmo tempo. O prazo é controlado pelo servidor, não pelo relógio de cada celular.
+4. Cada participante responde pelo celular; o telão mostra a pergunta, o tempo e revela a resposta certa assim que o prazo acaba.
+5. O organizador clica **Próxima pergunta** para avançar — isso é repetido até a última pergunta, ou ele pode **Encerrar quiz** a qualquer momento.
+6. Ao encerrar, celulares e telão mostram o ranking final automaticamente.
 
 ## Estrutura
 
 ```
-index.html      → experiência do participante (identificação → quiz → resultado)
-ranking.html    → ranking ao vivo, pensado para projetar num telão durante o evento
-admin.html      → painel administrativo (perguntas, ranking, configurações, estatísticas)
-css/            → tokens.css (identidade visual) + base.css + quiz.css + ranking.css + admin.css
-js/             → config.js (credenciais Supabase) + client.js + quiz.js + ranking.js + admin.js
+index.html      → experiência do participante (identificação → sala de espera → quiz sincronizado → resultado)
+telao.html      → tela para projetar: espelha a pergunta ativa e revela a resposta; mostra o ranking final
+ranking.html    → ranking ao vivo simples (útil fora do telão, ex.: acompanhar pelo próprio celular)
+admin.html      → painel administrativo (sessão ao vivo, perguntas, ranking, configurações, estatísticas)
+css/            → tokens.css (identidade visual) + base.css + quiz.css + ranking.css + telao.css + admin.css
+js/             → config.js (credenciais Supabase) + client.js + quiz.js + telao.js + ranking.js + admin.js
 assets/         → fontes (Adumu + League Spartan), ícones e imagem de identidade do evento
 supabase/       → migrations SQL (schema, funções e perguntas iniciais)
 ```
@@ -29,10 +41,12 @@ python3 -m http.server 8000
 
 O projeto já vem conectado a um projeto Supabase dedicado (`quiz-bottom-up-7-0`, plano gratuito). As credenciais (URL + anon key) estão em `js/config.js` — **isso é intencional e seguro**: a anon key não dá acesso direto a nenhuma tabela.
 
-Todo acesso ao banco passa por **funções RPC** (`security definer`) documentadas em `supabase/migrations/0001_init.sql`:
+Todo acesso ao banco passa por **funções RPC** (`security definer`), documentadas em `supabase/migrations/`:
 
-- Participante: `iniciar_participacao`, `obter_pergunta_atual`, `responder`, `finalizar_tentativa`, `ranking_publico`.
-- Admin: `admin_login`, `admin_logout`, `admin_trocar_senha`, `admin_listar_perguntas`, `admin_upsert_pergunta`, `admin_excluir_pergunta`, `admin_reordenar_perguntas`, `admin_atualizar_config`, `admin_resetar_ranking`, `admin_estatisticas`.
+- Participante/telão: `iniciar_participacao`, `obter_estado_sessao`, `responder`, `obter_meu_resultado`, `obter_gabarito_atual`, `ranking_publico`.
+- Admin: `admin_login`, `admin_logout`, `admin_trocar_senha`, `admin_iniciar_sessao`, `admin_proxima_pergunta`, `admin_encerrar_sessao`, `admin_reiniciar_sessao`, `admin_listar_perguntas`, `admin_upsert_pergunta`, `admin_excluir_pergunta`, `admin_reordenar_perguntas`, `admin_atualizar_config`, `admin_resetar_ranking`, `admin_estatisticas`.
+
+O prazo de cada pergunta (`prazo_fim`) é calculado pelo servidor a partir do momento em que o admin ativou aquela pergunta — o client nunca decide sozinho quando o tempo acaba, só espelha a contagem regressiva. O gabarito só é liberado (`obter_gabarito_atual`) depois que o próprio servidor confirma que o prazo já passou, então não tem como o telão (ou qualquer um) descobrir a resposta adiantado adiantando o relógio do aparelho.
 
 Nenhuma tabela (`questions`, `participantes`, `tentativas`, `respostas`, `admin_auth`, `admin_sessions`) libera `SELECT`/`INSERT`/`UPDATE` direto para o anon key — só `EXECUTE` nas funções acima. Isso significa que **a resposta certa nunca trafega para o navegador antes de o participante responder**, e a pontuação é sempre calculada e gravada pelo servidor (impossível de forjar pelo DevTools).
 
@@ -72,4 +86,4 @@ Dificuldade: facil
 
 ## Pontuação e ranking
 
-Cada acerto vale entre 50% e 100% dos pontos base da pergunta, proporcional à velocidade da resposta (responder rápido vale mais). O desempate no ranking é pelo tempo total gasto. Cada participante (identificado por nome + sobrenome + curso) só participa uma vez; fechar e reabrir a página no meio do quiz retoma de onde parou.
+Cada acerto vale entre 50% e 100% dos pontos base da pergunta, proporcional à velocidade da resposta (responder rápido vale mais). O desempate no ranking é pelo tempo total de resposta. Cada participante (identificado por nome + sobrenome + curso) entra uma única vez na sessão; fechar e reabrir a página a qualquer momento resincroniza automaticamente com a pergunta que estiver ativa. Depois que o organizador encerra o quiz, novas identificações são recusadas até a próxima sessão (**Resetar ranking**, no admin).

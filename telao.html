@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f0732">
+<meta name="description" content="Telão do Quiz Bottom UP 7.0 — projete esta tela para o público.">
+<title>Telão — Quiz Bottom UP 7.0</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/ranking.css">
+<link rel="stylesheet" href="css/telao.css">
+</head>
+<body class="corpo-ranking">
+
+<div class="palco-ranking palco-telao">
+
+  <!-- ═══ AGUARDANDO ═══ -->
+  <section id="telao-aguardando" class="tela-telao">
+    <div class="marca-evento marca-evento--claro marca-telao">
+      <span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span>
+    </div>
+    <p class="subtitulo-telao">Inovação que transforma: tecnologia, pessoas e sustentabilidade</p>
+    <div class="cartao-aguardando">
+      <span class="ponto-vivo"></span>
+      <h1>Aguardando o início do quiz</h1>
+      <p>Acesse pelo celular e se identifique — o quiz começa quando o organizador der o start.</p>
+      <p class="url-acesso" id="url-acesso"></p>
+    </div>
+  </section>
+
+  <!-- ═══ PERGUNTA ATIVA ═══ -->
+  <section id="telao-pergunta" class="tela-telao oculto">
+    <header class="topo-telao">
+      <div class="marca-evento marca-evento--claro">
+        <span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span>
+      </div>
+      <div class="progresso-telao">
+        <span id="telao-progresso">Pergunta 1 de 20</span>
+        <span class="separador">·</span>
+        <span id="telao-respondidas">0 respostas</span>
+      </div>
+    </header>
+
+    <div class="timer-telao">
+      <svg viewBox="0 0 36 36" class="timer-anel-telao">
+        <circle cx="18" cy="18" r="15.5" class="timer-trilha"></circle>
+        <circle cx="18" cy="18" r="15.5" class="timer-progresso-telao" id="telao-timer-circulo"></circle>
+      </svg>
+      <span id="telao-timer-segundos">25</span>
+    </div>
+
+    <div class="badges-telao">
+      <span class="badge badge-categoria" id="telao-badge-categoria">Categoria</span>
+      <span class="badge" id="telao-badge-dificuldade">Dificuldade</span>
+    </div>
+
+    <h1 class="enunciado-telao" id="telao-enunciado">Carregando pergunta...</h1>
+    <div class="opcoes-telao" id="telao-opcoes"></div>
+  </section>
+
+  <!-- ═══ FINALIZADO ═══ -->
+  <section id="telao-finalizado" class="tela-telao oculto">
+    <div class="marca-evento marca-evento--claro marca-telao-final">
+      <span class="b1">Bottom</span><span class="b2">UP</span><span class="b3">7.0</span>
+    </div>
+    <h1 class="titulo-final">🏆 Ranking final</h1>
+    <main class="miolo-ranking miolo-telao">
+      <div id="podio" class="podio"></div>
+      <div class="tabela-ranking-wrap">
+        <table class="tabela-ranking" id="tabela-ranking">
+          <thead><tr><th>#</th><th>Participante</th><th>Curso</th><th>Pontos</th><th>Tempo</th></tr></thead>
+          <tbody id="corpo-tabela-ranking"></tbody>
+        </table>
+      </div>
+    </main>
+  </section>
+
+</div>
+
+<script src="assets/vendor/supabase-js.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/client.js"></script>
+<script src="js/telao.js"></script>
+</body>
+</html>

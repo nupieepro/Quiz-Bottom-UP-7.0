@@ -52,6 +52,15 @@ body:has(#painel-admin:not(.oculto)) { background: var(--cream-2); }
 
 .barra-acoes { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); margin-bottom: var(--s5); flex-wrap: wrap; }
 
+/* ── Sessão ao vivo ── */
+.cartao-sessao { max-width: 640px; }
+.status-sessao { display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s6); flex-wrap: wrap; }
+.badge-sessao-aguardando { background: var(--aviso-bg); color: var(--aviso-texto); }
+.badge-sessao-ativa { background: var(--sucesso-bg); color: var(--sucesso-texto); }
+.badge-sessao-finalizada { background: #eee; color: var(--ink-soft); }
+.botoes-sessao { display: flex; flex-wrap: wrap; gap: var(--s3); margin-bottom: var(--s4); }
+.dica-sessao { margin: 0; }
+
 /* ── Lista de perguntas ── */
 .lista-perguntas { display: flex; flex-direction: column; gap: var(--s3); }
 .item-pergunta {

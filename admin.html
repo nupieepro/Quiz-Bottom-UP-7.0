@@ -55,7 +55,8 @@
   </div>
 
   <nav class="abas-admin">
-    <button class="aba-admin ativa" data-aba="perguntas">Perguntas</button>
+    <button class="aba-admin ativa" data-aba="sessao">Sessão ao vivo</button>
+    <button class="aba-admin" data-aba="perguntas">Perguntas</button>
     <button class="aba-admin" data-aba="ranking">Ranking</button>
     <button class="aba-admin" data-aba="config">Configurações</button>
     <button class="aba-admin" data-aba="estatisticas">Estatísticas</button>
@@ -63,8 +64,33 @@
 
   <main class="corpo-admin">
 
+    <!-- ── SESSÃO AO VIVO ── -->
+    <section id="painel-sessao" class="painel-aba">
+      <div class="barra-acoes">
+        <div>
+          <h2>Sessão ao vivo</h2>
+          <p class="texto-secundario">Controle o ritmo do quiz para todo mundo ao mesmo tempo. Projete o telão e deixe os participantes no celular.</p>
+        </div>
+        <a href="telao.html" target="_blank" rel="noopener" class="botao botao-secundario botao-sm">Abrir telão ↗</a>
+      </div>
+
+      <div class="cartao cartao-sessao">
+        <div class="status-sessao">
+          <span class="badge" id="sessao-badge-estado">—</span>
+          <span id="sessao-info-pergunta" class="texto-secundario"></span>
+        </div>
+        <div class="botoes-sessao">
+          <button class="botao botao-primario" id="botao-iniciar-sessao">▶ Iniciar quiz</button>
+          <button class="botao botao-primario" id="botao-proxima-pergunta" disabled>Próxima pergunta →</button>
+          <button class="botao botao-perigo" id="botao-encerrar-sessao" disabled>Encerrar quiz</button>
+          <button class="botao botao-fantasma botao-sm" id="botao-reiniciar-sessao">Voltar para a sala de espera</button>
+        </div>
+        <p class="dica-campo dica-sessao">"Voltar para a sala de espera" reinicia a sessão do zero sem apagar os pontos já registrados — use só se precisar corrigir algo antes do quiz de verdade começar.</p>
+      </div>
+    </section>
+
     <!-- ── PERGUNTAS ── -->
-    <section id="painel-perguntas" class="painel-aba">
+    <section id="painel-perguntas" class="painel-aba oculto">
       <div class="barra-acoes">
         <div>
           <h2>Banco de perguntas</h2>
