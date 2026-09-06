@@ -34,6 +34,7 @@
     sessionStorage.removeItem(CHAVE_TOKEN);
     estado.token = null;
     if (estado.pollSessao) { clearInterval(estado.pollSessao); estado.pollSessao = null; }
+    if (estado.tickSessao) { clearInterval(estado.tickSessao); estado.tickSessao = null; }
     el('painel-admin').classList.add('oculto');
     el('tela-login').classList.remove('oculto');
     if (msg) mostrarToast(msg, 'erro');
@@ -65,6 +66,7 @@
     el('painel-admin').classList.remove('oculto');
     await Promise.all([carregarConfig(), carregarPerguntas(), carregarSessao()]);
     if (!estado.pollSessao) estado.pollSessao = setInterval(carregarSessao, 2500);
+    if (!estado.tickSessao) estado.tickSessao = setInterval(tickSessao, INTERVALO_TICK_SESSAO_MS);
   }
 
   // ── Abas ──
@@ -84,37 +86,74 @@
   }
 
   // ══════════════════ SESSÃO AO VIVO ══════════════════
+  // A sessão avança sozinha: cada pergunta tem um prazo (prazo_fim)
+  // vindo do servidor, e assim que ele vence o próprio painel admin
+  // chama admin_proxima_pergunta automaticamente — ninguém precisa
+  // clicar em nada durante o quiz, nem o organizador. O botão
+  // "Próxima pergunta" continua disponível só como atalho manual
+  // (ex.: todo mundo já respondeu e dá pra adiantar).
   const ESTADO_SESSAO_LABEL = { aguardando: 'Aguardando', ativa: 'Ao vivo', finalizada: 'Encerrada' };
+  const INTERVALO_TICK_SESSAO_MS = 1000;
+  estado.sessaoInfo = null;
+  estado.avancando = false;
 
   async function carregarSessao() {
     try {
       const dados = await QuizClient.rpc('obter_estado_sessao');
-      const badge = el('sessao-badge-estado');
-      badge.textContent = ESTADO_SESSAO_LABEL[dados.estado] || dados.estado;
-      badge.className = `badge badge-sessao-${dados.estado}`;
-
-      el('sessao-info-pergunta').textContent = dados.estado === 'ativa'
-        ? `Pergunta ${dados.numero} de ${dados.total_perguntas} · ${dados.respondidas} resposta(s) recebida(s)`
-        : dados.estado === 'finalizada'
-          ? `${dados.total_perguntas} perguntas — quiz encerrado.`
-          : `${dados.total_perguntas} perguntas cadastradas, prontas pra começar.`;
-
-      el('botao-iniciar-sessao').disabled = dados.estado !== 'aguardando';
-      el('botao-proxima-pergunta').disabled = dados.estado !== 'ativa';
-      el('botao-encerrar-sessao').disabled = dados.estado !== 'ativa';
+      estado.sessaoInfo = dados;
+      atualizarPainelSessao(dados);
     } catch (erro) {
       console.error('Falha ao carregar sessão:', erro.message);
     }
+  }
+
+  function atualizarPainelSessao(dados) {
+    const badge = el('sessao-badge-estado');
+    badge.textContent = ESTADO_SESSAO_LABEL[dados.estado] || dados.estado;
+    badge.className = `badge badge-sessao-${dados.estado}`;
+
+    if (dados.estado === 'ativa') {
+      const restanteSeg = Math.max(0, Math.ceil((new Date(dados.prazo_fim).getTime() - Date.now()) / 1000));
+      el('sessao-info-pergunta').textContent = `Pergunta ${dados.numero} de ${dados.total_perguntas} · ${dados.respondidas} resposta(s) recebida(s) · próxima em ${restanteSeg}s`;
+    } else if (dados.estado === 'finalizada') {
+      el('sessao-info-pergunta').textContent = `${dados.total_perguntas} perguntas — quiz encerrado.`;
+    } else {
+      el('sessao-info-pergunta').textContent = `${dados.total_perguntas} perguntas cadastradas, prontas pra começar.`;
+    }
+
+    el('botao-iniciar-sessao').disabled = dados.estado !== 'aguardando';
+    el('botao-proxima-pergunta').disabled = dados.estado !== 'ativa';
+    el('botao-encerrar-sessao').disabled = dados.estado !== 'ativa';
+  }
+
+  async function avancarPergunta() {
+    if (estado.avancando) return;
+    estado.avancando = true;
+    try {
+      await rpcAdmin('admin_proxima_pergunta');
+      await carregarSessao();
+    } catch (erro) {
+      mostrarToast(erro.message, 'erro');
+    } finally {
+      estado.avancando = false;
+    }
+  }
+
+  function tickSessao() {
+    const info = estado.sessaoInfo;
+    if (!info || info.estado !== 'ativa' || !info.prazo_fim) return;
+    const restanteMs = new Date(info.prazo_fim).getTime() - Date.now();
+    if (restanteMs <= 0) { avancarPergunta(); return; }
+    // atualiza só a contagem regressiva, sem bater no servidor de novo
+    const restanteSeg = Math.ceil(restanteMs / 1000);
+    el('sessao-info-pergunta').textContent = `Pergunta ${info.numero} de ${info.total_perguntas} · ${info.respondidas} resposta(s) recebida(s) · próxima em ${restanteSeg}s`;
   }
 
   el('botao-iniciar-sessao').addEventListener('click', async () => {
     try { await rpcAdmin('admin_iniciar_sessao'); mostrarToast('Quiz iniciado! Todo mundo já vê a primeira pergunta.', 'sucesso'); await carregarSessao(); }
     catch (erro) { mostrarToast(erro.message, 'erro'); }
   });
-  el('botao-proxima-pergunta').addEventListener('click', async () => {
-    try { await rpcAdmin('admin_proxima_pergunta'); await carregarSessao(); }
-    catch (erro) { mostrarToast(erro.message, 'erro'); }
-  });
+  el('botao-proxima-pergunta').addEventListener('click', avancarPergunta);
   el('botao-encerrar-sessao').addEventListener('click', async () => {
     if (!confirm('Encerrar o quiz agora? O ranking final fica disponível pra todo mundo.')) return;
     try { await rpcAdmin('admin_encerrar_sessao'); mostrarToast('Quiz encerrado.', 'sucesso'); await carregarSessao(); }
