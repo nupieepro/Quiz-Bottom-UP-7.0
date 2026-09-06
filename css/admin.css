@@ -31,6 +31,17 @@ body:has(#painel-admin:not(.oculto)) { background: var(--cream-2); }
   overflow-x: auto;
   position: sticky; top: 0; z-index: 19;
 }
+@media (max-width: 640px) {
+  /* Nem todas as abas cabem numa tela de celular — o degradê na
+     borda direita avisa que dá pra arrastar pra ver o resto
+     (Configurações, Estatísticas), em vez de simplesmente cortar. */
+  .abas-admin {
+    padding: 0 var(--s4);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);
+  }
+  .aba-admin { padding: 14px 12px; font-size: 13px; }
+}
 .aba-admin {
   border: none; background: none; cursor: pointer;
   padding: 16px 18px;
@@ -98,6 +109,15 @@ body:has(#painel-admin:not(.oculto)) { background: var(--cream-2); }
 .tabela-admin tbody tr:last-child td { border-bottom: none; }
 .tabela-admin tr.linha-oculta { opacity: 0.5; }
 .tabela-admin .item-pergunta-acoes { display: flex; gap: 6px; }
+
+@media (max-width: 640px) {
+  /* Mesma lógica do menu de abas: a tabela tem mais colunas do que
+     cabe na tela, o degradê avisa que dá pra arrastar pro lado. */
+  .tabela-admin-wrap {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%);
+  }
+}
 
 /* ── Formulários / grades ── */
 .cartao-form { max-width: 640px; }

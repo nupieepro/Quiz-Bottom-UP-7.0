@@ -19,9 +19,19 @@
 .cartao-aguardando p { color: var(--on-navy-soft); font-size: 18px; }
 .url-acesso { font-family: var(--fonte-mono); color: var(--gold) !important; font-size: 20px !important; margin-top: var(--s5) !important; }
 
-.tela-ranking-telao { max-width: 1100px; }
-.tela-ranking-telao .titulo-final { font-size: 36px; margin-bottom: var(--s8); }
-.miolo-telao { max-width: 900px; padding: 0; margin: 0 auto; }
+.tela-ranking-telao { max-width: 1200px; }
+.tela-ranking-telao .titulo-final { color: #fff; font-size: 40px; margin-bottom: var(--s8); }
+.miolo-telao { max-width: 1000px; padding: 0; margin: 0 auto; }
+
+/* Texto maior que o padrão de ranking.css: aqui é lido de longe,
+   projetado numa parede, não numa tela de celular na mão. */
+.tela-ranking-telao .indicador-vivo { font-size: 15px; padding: 10px 20px; }
+.tela-ranking-telao .medalha-podio { font-size: 44px; }
+.tela-ranking-telao .nome-podio { font-size: 22px; }
+.tela-ranking-telao .curso-podio { font-size: 15px; }
+.tela-ranking-telao .pontos-podio { font-size: 30px; }
+.tela-ranking-telao .tabela-ranking th { font-size: 13px; padding: 18px 22px; }
+.tela-ranking-telao .tabela-ranking td { font-size: 20px; padding: 16px 22px; }
 
 @media (max-width: 720px) {
   .marca-telao { font-size: 40px; }
