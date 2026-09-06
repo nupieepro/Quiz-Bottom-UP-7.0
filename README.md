@@ -52,7 +52,7 @@ O projeto já vem conectado a um projeto Supabase dedicado (`quiz-bottom-up-7-0`
 Todo acesso ao banco passa por **funções RPC** (`security definer`), documentadas em `supabase/migrations/`:
 
 - Participante/telão: `iniciar_participacao`, `obter_estado_sessao`, `responder`, `obter_meu_resultado`, `obter_gabarito_atual`, `ranking_publico`.
-- Admin: `admin_login`, `admin_logout`, `admin_trocar_senha`, `admin_iniciar_sessao`, `admin_proxima_pergunta`, `admin_encerrar_sessao`, `admin_reiniciar_sessao`, `admin_listar_perguntas`, `admin_upsert_pergunta`, `admin_excluir_pergunta`, `admin_reordenar_perguntas`, `admin_atualizar_config`, `admin_resetar_ranking`, `admin_estatisticas`, `admin_listar_participantes`, `admin_editar_participante`, `admin_alternar_oculto_ranking`, `admin_excluir_participante`.
+- Admin: `admin_login`, `admin_logout`, `admin_trocar_senha`, `admin_iniciar_sessao`, `admin_proxima_pergunta`, `admin_encerrar_sessao`, `admin_reiniciar_sessao`, `admin_listar_perguntas`, `admin_upsert_pergunta`, `admin_excluir_pergunta`, `admin_reordenar_perguntas`, `admin_importar_perguntas`, `admin_atualizar_config`, `admin_resetar_ranking`, `admin_estatisticas`, `admin_listar_participantes`, `admin_editar_participante`, `admin_alternar_oculto_ranking`, `admin_excluir_participante`.
 
 O prazo de cada pergunta (`prazo_fim`) é calculado pelo servidor a partir do momento em que o admin ativou aquela pergunta — o client nunca decide sozinho quando o tempo acaba, só espelha a contagem regressiva. O gabarito só é liberado (`obter_gabarito_atual`) depois que o próprio servidor confirma que o prazo já passou; quem responde vê na hora pela própria resposta, e quem não responde a tempo vê o destaque da opção certa no próprio celular assim que o prazo fecha.
 
@@ -74,7 +74,7 @@ Identidade visual herdada do Nupieepro e do material oficial do Bottom UP 7.0: a
 
 ## Perguntas
 
-O banco inicial tem 20 perguntas de Engenharia de Produção (2 por área ABEPRO: Operações, Logística, Pesquisa Operacional, Qualidade, Produto, Organizacional, Econômica, Trabalho, Sustentabilidade e Tecnologia/Inovação), todas conceituais — nenhuma exige cálculo pra responder. Tudo — enunciado, opções, resposta certa, explicação, dificuldade, pontuação e ordem — é editável pelo painel admin, sem precisar mexer no banco.
+O banco tem 20 perguntas de Engenharia em geral (não só Produção), conceituais e alinhadas ao tema do evento — "Inovação que transforma: tecnologia, pessoas e sustentabilidade" —, com dificuldade acessível (a maioria fácil/médio) e **nenhuma exige cálculo pra responder**. Tudo — enunciado, opções, resposta certa, explicação, dificuldade, pontuação e ordem — é editável pelo painel admin, sem precisar mexer no banco.
 
 No editor de perguntas (`admin.html` → **+ Nova pergunta** ou ✏️ numa existente) tem um **modo texto**: em vez de preencher campo por campo, dá pra colar tudo de uma vez nesse formato e clicar em "Preencher formulário":
 
@@ -91,6 +91,15 @@ Dificuldade: facil
 ```
 
 `Explicação`, `Categoria` e `Dificuldade` são opcionais — o sistema separa enunciado, alternativas e resposta certa sozinho e você só confere antes de salvar.
+
+### Editar todas as perguntas de uma vez (só o admin)
+
+Na aba **Perguntas**, dois botões extras:
+
+- **⬇ Exportar tudo (.txt)** — baixa um documento de texto com todas as perguntas atuais, cada uma no mesmo formato do modo texto, separadas por uma linha `---`.
+- **⬆ Importar em lote** — cole esse documento editado (ou carregue o `.txt` de volta) e clique em "Processar e importar". O sistema interpreta cada pergunta separada por `---`, mostra qualquer problema encontrado (sem aplicar nada até tudo estar certo) e, se tudo validar, **substitui o banco inteiro numa operação só** — ou dá tudo certo, ou nada muda. Só funciona se ainda não houver respostas registradas na sessão atual (evita trocar o banco de baixo de quem já está respondendo).
+
+Esse fluxo é pensado pra quem prefere revisar/escrever as perguntas num editor de texto ou Word e trazer tudo de volta de uma vez, em vez de editar pergunta por pergunta.
 
 ## Pontuação e ranking
 
