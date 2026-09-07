@@ -126,6 +126,16 @@
 /* ── Resultado / mensagem ── */
 .cartao-resultado, .cartao-mensagem { text-align: center; }
 .medalha { font-size: clamp(36px, 7svh, 68px); margin-bottom: clamp(4px, 1svh, 16px); }
+.numero-contagem {
+  font-family: var(--fonte-mono);
+  font-weight: 800;
+  font-size: clamp(56px, 12svh, 96px);
+  line-height: 1;
+  color: var(--orange);
+  margin-bottom: clamp(6px, 1.4svh, 16px);
+  animation: pulsar-contagem 1s ease-in-out infinite;
+}
+@keyframes pulsar-contagem { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
 .titulo-resultado { font-size: clamp(20px, 3.4svh, 32px); margin-bottom: clamp(4px, 1svh, 10px); }
 .texto-resultado { color: var(--ink-soft); font-size: 15px; margin-bottom: clamp(8px, 1.8svh, 30px); }
 .grade-resultado { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s3); margin-bottom: clamp(12px, 2.6svh, 40px); }

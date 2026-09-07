@@ -19,6 +19,17 @@
 .cartao-aguardando p { color: var(--on-navy-soft); font-size: 18px; }
 .url-acesso { font-family: var(--fonte-mono); color: var(--gold) !important; font-size: 20px !important; margin-top: var(--s5) !important; }
 
+.numero-contagem-telao {
+  font-family: var(--fonte-mono);
+  font-weight: 800;
+  font-size: 140px;
+  line-height: 1;
+  color: var(--gold);
+  margin-bottom: var(--s4);
+  animation: pulsar-contagem-telao 1s ease-in-out infinite;
+}
+@keyframes pulsar-contagem-telao { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
 .tela-ranking-telao { max-width: 1200px; }
 .tela-ranking-telao .titulo-final { color: #fff; font-size: 40px; margin-bottom: var(--s8); }
 .miolo-telao { max-width: 1000px; padding: 0; margin: 0 auto; }

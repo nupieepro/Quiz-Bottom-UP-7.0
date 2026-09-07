@@ -7,10 +7,11 @@
 
   const telas = {
     aguardando: document.getElementById('telao-aguardando'),
+    contagem: document.getElementById('telao-contagem'),
     ranking: document.getElementById('telao-ranking'),
   };
 
-  const estado = { telaAtual: null };
+  const estado = { telaAtual: null, contagemTimer: null };
 
   document.getElementById('url-acesso').textContent = window.location.origin.replace(/^https?:\/\//, '');
 
@@ -30,10 +31,20 @@
   async function sincronizarEstado() {
     try {
       const dados = await QuizClient.rpc('obter_estado_sessao');
+      QuizClient.corrigirRelogio(dados.agora);
       if (dados.estado === 'aguardando') {
+        pararContagem();
         mostrarTela('aguardando');
         return;
       }
+      if (dados.estado === 'ativa' && dados.numero === 1 && dados.pergunta_iniciada_em) {
+        const inicioMs = new Date(dados.pergunta_iniciada_em).getTime();
+        if (inicioMs - QuizClient.agoraCorrigido() > 300) {
+          iniciarContagem(inicioMs);
+          return;
+        }
+      }
+      pararContagem();
       mostrarTela('ranking');
       if (dados.estado === 'ativa') {
         document.getElementById('telao-ponto-vivo').classList.remove('oculto');
@@ -47,6 +58,27 @@
     } catch (erro) {
       console.error('Falha ao sincronizar telão:', erro.message);
     }
+  }
+
+  // Contagem regressiva de 5s só antes da 1ª pergunta (ver
+  // admin_iniciar_sessao) — o mesmo "Vamos começar!" que aparece no
+  // celular de cada participante, pra ficar em sincronia com o telão.
+  function iniciarContagem(inicioMs) {
+    mostrarTela('contagem');
+    const elNumero = document.getElementById('numero-contagem-telao');
+    const atualizar = () => {
+      const restanteMs = inicioMs - QuizClient.agoraCorrigido();
+      if (restanteMs <= 0) { pararContagem(); return; }
+      elNumero.textContent = Math.ceil(restanteMs / 1000);
+    };
+    atualizar();
+    if (estado.contagemTimer) clearInterval(estado.contagemTimer);
+    estado.contagemTimer = setInterval(atualizar, 200);
+  }
+
+  function pararContagem() {
+    if (estado.contagemTimer) clearInterval(estado.contagemTimer);
+    estado.contagemTimer = null;
   }
 
   async function sincronizarRanking() {
