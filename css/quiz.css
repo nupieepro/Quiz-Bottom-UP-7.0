@@ -35,22 +35,29 @@
 
 /* ── Identificação ── */
 .cartao-identificacao { text-align: left; }
-.etiqueta-topo { margin-bottom: clamp(6px, 1.6svh, var(--s4)); background: var(--cream-2); color: var(--orange); }
+.etiqueta-topo { margin-bottom: clamp(6px, 1.6svh, 20px); background: var(--cream-2); color: var(--orange); }
 .titulo-hero {
-  font-size: clamp(22px, min(6vw, 4.6svh), 38px);
+  font-size: clamp(22px, min(6vw, 4.6svh), 42px);
   line-height: 1.1;
-  margin-bottom: clamp(4px, 1svh, var(--s3));
+  margin-bottom: clamp(4px, 1svh, 16px);
 }
 .destaque-laranja { color: var(--orange); }
-.texto-intro { color: var(--ink-soft); font-size: 15px; line-height: 1.5; margin-bottom: clamp(8px, 2svh, var(--s6)); }
+.texto-intro { color: var(--ink-soft); font-size: 15px; line-height: 1.5; margin-bottom: clamp(8px, 2svh, 32px); }
 
-.campo { margin-bottom: clamp(8px, 1.8svh, var(--s5)); gap: clamp(3px, 0.7svh, 6px); }
-.campo input, .campo select, .campo textarea { padding: clamp(9px, 1.6svh, 13px) 16px; }
-.campo label { font-size: clamp(11px, 1.5svh, 13px); }
+.campo { margin-bottom: clamp(8px, 1.8svh, 26px); gap: clamp(3px, 0.7svh, 8px); }
+.campo input, .campo select, .campo textarea { padding: clamp(9px, 1.6svh, 16px) 16px; }
+.campo label { font-size: clamp(11px, 1.5svh, 14px); }
 
-/* ── Quiz ── */
-.cartao-quiz { padding: clamp(12px, 2.6svh, var(--s6)); }
-.cabecalho-quiz { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); margin-bottom: clamp(8px, 1.8svh, var(--s5)); }
+/* ── Quiz ──
+   Mantém exatamente os mesmos coeficientes de svh já testados (o que
+   garante caber sem rolar em qualquer celular real) — só o teto
+   máximo de cada clamp() sobe. Isso deixa o crescimento continuar
+   além de ~900px de altura em vez de travar cedo, usando de verdade
+   o espaço de telas maiores, sem arriscar o encaixe nas menores:
+   abaixo do ponto onde cada um batia no teto antigo, o valor
+   calculado é idêntico a antes, byte a byte. */
+.cartao-quiz { padding: clamp(12px, 2.6svh, 36px); }
+.cabecalho-quiz { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); margin-bottom: clamp(8px, 1.8svh, 26px); }
 .progresso-info { flex: 1; }
 .progresso-info span { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; }
 .barra-progresso { height: 6px; background: var(--border-soft); border-radius: var(--r-full); margin-top: 6px; overflow: hidden; }
@@ -59,12 +66,12 @@
 .rotulo-placar { display: block; font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; }
 .valor-placar { font-family: var(--fonte-mono); font-size: 22px; font-weight: 700; color: var(--navy); }
 
-.linha-meta { display: flex; align-items: center; gap: var(--s2); margin-bottom: clamp(8px, 1.8svh, var(--s5)); }
+.linha-meta { display: flex; align-items: center; gap: var(--s2); margin-bottom: clamp(8px, 1.8svh, 26px); }
 .linha-meta .badge-dificuldade,
 #badge-dificuldade { background: var(--cream-2); color: var(--ink-soft); }
 .linha-meta { position: relative; }
 
-.timer { margin-left: auto; position: relative; width: clamp(32px, 5.5svh, 44px); height: clamp(32px, 5.5svh, 44px); display: flex; align-items: center; justify-content: center; }
+.timer { margin-left: auto; position: relative; width: clamp(32px, 5.5svh, 56px); height: clamp(32px, 5.5svh, 56px); display: flex; align-items: center; justify-content: center; }
 .timer-anel { width: 100%; height: 100%; transform: rotate(-90deg); position: absolute; inset: 0; }
 .timer-trilha { fill: none; stroke: var(--border-soft); stroke-width: 3; }
 .timer-progresso {
@@ -73,19 +80,19 @@
   transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
 }
 .timer-progresso.tempo-critico { stroke: var(--erro); }
-#timer-segundos { font-family: var(--fonte-mono); font-size: clamp(11px, 1.8svh, 13px); font-weight: 700; color: var(--ink); position: relative; z-index: 1; }
+#timer-segundos { font-family: var(--fonte-mono); font-size: clamp(11px, 1.8svh, 16px); font-weight: 700; color: var(--ink); position: relative; z-index: 1; }
 
-.enunciado { font-size: clamp(16px, min(3.6vw, 2.6svh), 23px); line-height: 1.3; margin-bottom: clamp(8px, 2.2svh, var(--s6)); }
+.enunciado { font-size: clamp(16px, min(3.6vw, 2.6svh), 27px); line-height: 1.32; margin-bottom: clamp(8px, 2.2svh, 32px); }
 
-.opcoes { display: flex; flex-direction: column; gap: clamp(5px, 1svh, var(--s3)); }
+.opcoes { display: flex; flex-direction: column; gap: clamp(5px, 1svh, 18px); }
 .opcao {
   display: flex; align-items: center; gap: var(--s3);
   text-align: left;
   border: 2px solid var(--border-soft);
   background: var(--cream-2);
   border-radius: var(--r-md);
-  padding: clamp(8px, 1.4svh, 14px) 16px;
-  font-size: clamp(13.5px, 2svh, 15.5px);
+  padding: clamp(8px, 1.4svh, 20px) clamp(14px, 2.5vw, 20px);
+  font-size: clamp(13.5px, 2svh, 17px);
   font-weight: 600;
   color: var(--ink);
   cursor: pointer;
@@ -94,12 +101,12 @@
 .opcao:hover:not(:disabled) { border-color: var(--orange-2); background: #fff; transform: translateX(2px); }
 .opcao:disabled { cursor: default; }
 .opcao .letra-opcao {
-  width: clamp(24px, 4.2svh, 30px); height: clamp(24px, 4.2svh, 30px); flex-shrink: 0;
+  width: clamp(24px, 4.2svh, 36px); height: clamp(24px, 4.2svh, 36px); flex-shrink: 0;
   border-radius: 50%;
   background: var(--white);
   border: 2px solid var(--border-medium);
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--fonte-mono); font-weight: 700; font-size: clamp(11px, 1.8svh, 13px); color: var(--ink-soft);
+  font-family: var(--fonte-mono); font-weight: 700; font-size: clamp(11px, 1.8svh, 14px); color: var(--ink-soft);
 }
 .opcao.selecionada { border-color: var(--navy); background: #fff; }
 .opcao.selecionada .letra-opcao { background: var(--navy); border-color: var(--navy); color: #fff; }
@@ -118,17 +125,17 @@
 
 /* ── Resultado / mensagem ── */
 .cartao-resultado, .cartao-mensagem { text-align: center; }
-.medalha { font-size: clamp(36px, 7svh, 56px); margin-bottom: clamp(4px, 1svh, var(--s3)); }
-.titulo-resultado { font-size: clamp(20px, 3.4svh, 26px); margin-bottom: var(--s2); }
-.texto-resultado { color: var(--ink-soft); font-size: 15px; margin-bottom: clamp(8px, 1.8svh, var(--s6)); }
-.grade-resultado { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s3); margin-bottom: clamp(12px, 2.6svh, var(--s8)); }
+.medalha { font-size: clamp(36px, 7svh, 68px); margin-bottom: clamp(4px, 1svh, 16px); }
+.titulo-resultado { font-size: clamp(20px, 3.4svh, 32px); margin-bottom: clamp(4px, 1svh, 10px); }
+.texto-resultado { color: var(--ink-soft); font-size: 15px; margin-bottom: clamp(8px, 1.8svh, 30px); }
+.grade-resultado { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s3); margin-bottom: clamp(12px, 2.6svh, 40px); }
 .metrica { background: var(--cream-2); border-radius: var(--r-md); padding: var(--s4) var(--s2); }
 .metrica-destaque { background: linear-gradient(155deg, var(--navy) 0%, var(--navy-2) 100%); }
 .metrica-destaque .metrica-valor { color: var(--orange-2); }
 .metrica-destaque .metrica-rotulo { color: var(--on-navy-soft); }
 .metrica-valor { display: block; font-family: var(--fonte-mono); font-size: 24px; font-weight: 700; color: var(--navy); }
 .metrica-rotulo { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.03em; }
-.nota-rodape { margin-top: clamp(6px, 1.4svh, var(--s5)); font-size: 13px; color: var(--ink-faint); }
+.nota-rodape { margin-top: clamp(6px, 1.4svh, 24px); font-size: 13px; color: var(--ink-faint); }
 
 @media (max-width: 480px) {
   .grade-resultado { grid-template-columns: 1fr; }
@@ -138,9 +145,9 @@
    .topo/.cartao já existem em base.css (compartilhados com admin e
    ranking); aqui só a versão usada nesta página ganha o ajuste por
    svh, sem mexer nas outras. */
-.topo-quiz { padding: clamp(6px, 1.3svh, var(--s5)) var(--s4); }
-.topo-quiz .selo-quadrado { width: clamp(30px, 5.2svh, 44px); height: clamp(30px, 5.2svh, 44px); }
-.topo-quiz .selo-quadrado span { font-size: clamp(14px, 2.6svh, 22px); }
-.topo-quiz .subtitulo-evento { font-size: clamp(9px, 1.4svh, 12px); }
-.conteudo-quiz { padding-top: clamp(8px, 2svh, var(--s6)); padding-bottom: clamp(8px, 2svh, var(--s6)); }
-.cartao:not(.cartao-quiz) { padding: clamp(14px, 3svh, var(--s8)); }
+.topo-quiz { padding: clamp(6px, 1.3svh, 26px) var(--s4); }
+.topo-quiz .selo-quadrado { width: clamp(30px, 5.2svh, 52px); height: clamp(30px, 5.2svh, 52px); }
+.topo-quiz .selo-quadrado span { font-size: clamp(14px, 2.6svh, 26px); }
+.topo-quiz .subtitulo-evento { font-size: clamp(9px, 1.4svh, 13px); }
+.conteudo-quiz { padding-top: clamp(8px, 2svh, 28px); padding-bottom: clamp(8px, 2svh, 28px); }
+.cartao:not(.cartao-quiz) { padding: clamp(14px, 3svh, 40px); }
