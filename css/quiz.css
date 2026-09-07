@@ -115,3 +115,48 @@
 @media (max-width: 480px) {
   .grade-resultado { grid-template-columns: 1fr; }
 }
+
+/* ── Encaixe sem rolagem em telas baixas ──
+   O alvo é a altura da tela (não a largura): um celular estreito e
+   alto sobra espaço, mas um celular baixo (ou o teclado abrindo)
+   aperta. Comprime cabeçalho e espaçamentos da tela de pergunta —
+   que é a mais cheia — pra caber inteira sem precisar rolar. */
+@media (max-height: 900px) {
+  .topo-quiz { padding: 10px var(--s4); }
+  .topo-quiz .selo-quadrado { width: 34px; height: 34px; border-radius: 9px; }
+  .topo-quiz .selo-quadrado span { font-size: 17px; }
+  .topo-quiz .subtitulo-evento { display: none; }
+  .conteudo-quiz { padding: var(--s3) var(--s4); }
+  .cartao-quiz { padding: var(--s4); }
+  .cabecalho-quiz { margin-bottom: var(--s3); }
+  .linha-meta { margin-bottom: var(--s3); }
+  .timer, .timer-anel { width: 36px; height: 36px; }
+  .enunciado { font-size: clamp(17px, 4vw, 21px); line-height: 1.28; margin-bottom: var(--s4); }
+  .opcoes { gap: 8px; }
+  .opcao { padding: 11px 14px; font-size: 14.5px; }
+  .opcao .letra-opcao { width: 26px; height: 26px; font-size: 12px; }
+  .campo { margin-bottom: var(--s3); }
+  .etiqueta-topo { margin-bottom: var(--s3); }
+  .titulo-hero { margin-bottom: var(--s2); }
+  .texto-intro { margin-bottom: var(--s4); }
+  .medalha { font-size: 44px; margin-bottom: var(--s2); }
+  .titulo-resultado { font-size: 22px; }
+  .texto-resultado { margin-bottom: var(--s4); }
+  .grade-resultado { margin-bottom: var(--s5); }
+  .nota-rodape { margin-top: var(--s3); }
+}
+
+/* Telas realmente minúsculas (celulares antigos, ex.: 320×568) —
+   aperta mais um degrau em cima do anterior. */
+@media (max-height: 600px) {
+  .titulo-hero { font-size: clamp(23px, 6vw, 30px); }
+  .campo { margin-bottom: var(--s2); gap: 4px; }
+  .campo input { padding: 9px 14px; }
+  .campo label { font-size: 12px; }
+  .etiqueta-topo { display: none; }
+  .cartao { padding: var(--s4); }
+  .cabecalho-quiz, .linha-meta { margin-bottom: 8px; }
+  .enunciado { font-size: 16px; margin-bottom: 10px; }
+  .opcoes { gap: 6px; }
+  .opcao { padding: 9px 12px; font-size: 14px; }
+}
