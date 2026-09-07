@@ -120,43 +120,47 @@
    O alvo é a altura da tela (não a largura): um celular estreito e
    alto sobra espaço, mas um celular baixo (ou o teclado abrindo)
    aperta. Comprime cabeçalho e espaçamentos da tela de pergunta —
-   que é a mais cheia — pra caber inteira sem precisar rolar. */
-@media (max-height: 900px) {
-  .topo-quiz { padding: 10px var(--s4); }
-  .topo-quiz .selo-quadrado { width: 34px; height: 34px; border-radius: 9px; }
-  .topo-quiz .selo-quadrado span { font-size: 17px; }
-  .topo-quiz .subtitulo-evento { display: none; }
-  .conteudo-quiz { padding: var(--s3) var(--s4); }
-  .cartao-quiz { padding: var(--s4); }
-  .cabecalho-quiz { margin-bottom: var(--s3); }
-  .linha-meta { margin-bottom: var(--s3); }
-  .timer, .timer-anel { width: 36px; height: 36px; }
-  .enunciado { font-size: clamp(17px, 4vw, 21px); line-height: 1.28; margin-bottom: var(--s4); }
-  .opcoes { gap: 8px; }
-  .opcao { padding: 11px 14px; font-size: 14.5px; }
-  .opcao .letra-opcao { width: 26px; height: 26px; font-size: 12px; }
-  .campo { margin-bottom: var(--s3); }
-  .etiqueta-topo { margin-bottom: var(--s3); }
-  .titulo-hero { margin-bottom: var(--s2); }
-  .texto-intro { margin-bottom: var(--s4); }
-  .medalha { font-size: 44px; margin-bottom: var(--s2); }
-  .titulo-resultado { font-size: 22px; }
-  .texto-resultado { margin-bottom: var(--s4); }
-  .grade-resultado { margin-bottom: var(--s5); }
-  .nota-rodape { margin-top: var(--s3); }
-}
+   que é a mais cheia — pra caber inteira sem precisar rolar.
+   Importante: isso é uma CLASSE no <body> (calculada uma vez em
+   js/quiz.js), não um @media (max-height). A barra de endereço do
+   Chrome/Android esconde e reaparece sozinha ao rolar, mudando a
+   altura da tela várias vezes por segundo — um @media aqui ficaria
+   ligando e desligando ao vivo, fazendo cabeçalho e card mudarem de
+   tamanho na mesma pergunta. Calculando uma vez só e travando numa
+   classe, o layout já escolhido nunca mais pisca. */
+body.tela-compacta .topo-quiz { padding: 10px var(--s4); }
+body.tela-compacta .topo-quiz .selo-quadrado { width: 34px; height: 34px; border-radius: 9px; }
+body.tela-compacta .topo-quiz .selo-quadrado span { font-size: 17px; }
+body.tela-compacta .topo-quiz .subtitulo-evento { display: none; }
+body.tela-compacta .conteudo-quiz { padding: var(--s3) var(--s4); }
+body.tela-compacta .cartao-quiz { padding: var(--s4); }
+body.tela-compacta .cabecalho-quiz { margin-bottom: var(--s3); }
+body.tela-compacta .linha-meta { margin-bottom: var(--s3); }
+body.tela-compacta .timer, body.tela-compacta .timer-anel { width: 36px; height: 36px; }
+body.tela-compacta .enunciado { font-size: clamp(17px, 4vw, 21px); line-height: 1.28; margin-bottom: var(--s4); }
+body.tela-compacta .opcoes { gap: 8px; }
+body.tela-compacta .opcao { padding: 11px 14px; font-size: 14.5px; }
+body.tela-compacta .opcao .letra-opcao { width: 26px; height: 26px; font-size: 12px; }
+body.tela-compacta .campo { margin-bottom: var(--s3); }
+body.tela-compacta .etiqueta-topo { margin-bottom: var(--s3); }
+body.tela-compacta .titulo-hero { margin-bottom: var(--s2); }
+body.tela-compacta .texto-intro { margin-bottom: var(--s4); }
+body.tela-compacta .medalha { font-size: 44px; margin-bottom: var(--s2); }
+body.tela-compacta .titulo-resultado { font-size: 22px; }
+body.tela-compacta .texto-resultado { margin-bottom: var(--s4); }
+body.tela-compacta .grade-resultado { margin-bottom: var(--s5); }
+body.tela-compacta .nota-rodape { margin-top: var(--s3); }
 
 /* Telas realmente minúsculas (celulares antigos, ex.: 320×568) —
-   aperta mais um degrau em cima do anterior. */
-@media (max-height: 600px) {
-  .titulo-hero { font-size: clamp(23px, 6vw, 30px); }
-  .campo { margin-bottom: var(--s2); gap: 4px; }
-  .campo input { padding: 9px 14px; }
-  .campo label { font-size: 12px; }
-  .etiqueta-topo { display: none; }
-  .cartao { padding: var(--s4); }
-  .cabecalho-quiz, .linha-meta { margin-bottom: 8px; }
-  .enunciado { font-size: 16px; margin-bottom: 10px; }
-  .opcoes { gap: 6px; }
-  .opcao { padding: 9px 12px; font-size: 14px; }
-}
+   aperta mais um degrau em cima do anterior. Mesma lógica: classe
+   travada, não @media. */
+body.tela-minima .titulo-hero { font-size: clamp(23px, 6vw, 30px); }
+body.tela-minima .campo { margin-bottom: var(--s2); gap: 4px; }
+body.tela-minima .campo input { padding: 9px 14px; }
+body.tela-minima .campo label { font-size: 12px; }
+body.tela-minima .etiqueta-topo { display: none; }
+body.tela-minima .cartao { padding: var(--s4); }
+body.tela-minima .cabecalho-quiz, body.tela-minima .linha-meta { margin-bottom: 8px; }
+body.tela-minima .enunciado { font-size: 16px; margin-bottom: 10px; }
+body.tela-minima .opcoes { gap: 6px; }
+body.tela-minima .opcao { padding: 9px 12px; font-size: 14px; }
