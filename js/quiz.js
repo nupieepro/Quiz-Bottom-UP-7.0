@@ -36,6 +36,7 @@
   const telas = {
     identificacao: document.getElementById('tela-identificacao'),
     lobby: document.getElementById('tela-lobby'),
+    contagem: document.getElementById('tela-contagem'),
     quiz: document.getElementById('tela-quiz'),
     resultado: document.getElementById('tela-resultado'),
     mensagem: document.getElementById('tela-mensagem'),
@@ -50,6 +51,7 @@
     pontuacaoAtual: 0,
     tickTimer: null,
     pollTimer: null,
+    contagemTimer: null,
   };
 
   function mostrarTela(nome) {
@@ -143,8 +145,10 @@
   function pararRelogios() {
     if (estado.pollTimer) clearInterval(estado.pollTimer);
     if (estado.tickTimer) clearInterval(estado.tickTimer);
+    if (estado.contagemTimer) clearInterval(estado.contagemTimer);
     estado.pollTimer = null;
     estado.tickTimer = null;
+    estado.contagemTimer = null;
   }
 
   async function sincronizarEstado() {
@@ -181,20 +185,52 @@
     mostrarToast('O organizador reiniciou o quiz — identifique-se novamente pra participar da nova rodada.', 'erro');
   }
 
+  // Só a primeira pergunta tem esse atraso (ver admin_iniciar_sessao);
+  // as seguintes chegam com pergunta_iniciada_em já no passado, então
+  // a contagem nem aparece — vai direto pra pergunta, como sempre foi.
   function aplicarPerguntaAtiva(dados) {
     if (dados.numero !== estado.numeroPerguntaExibida) {
       estado.numeroPerguntaExibida = dados.numero;
-      estado.respondida = false;
-      estado.cliquei = false;
-      estado.questaoAtualId = dados.pergunta.id;
-      estado.gabaritoRevelado = false;
-      estado.prazoFim = new Date(dados.prazo_fim).getTime();
-      estado.tempoLimiteMs = dados.tempo_por_pergunta_seg * 1000;
-      renderizarPergunta(dados);
-      mostrarTela('quiz');
-      if (!estado.tickTimer) estado.tickTimer = setInterval(tick, INTERVALO_TICK_MS);
-      tick();
+      const inicioMs = dados.pergunta_iniciada_em ? new Date(dados.pergunta_iniciada_em).getTime() : 0;
+      const faltamMs = inicioMs - QuizClient.agoraCorrigido();
+      if (faltamMs > 300) {
+        iniciarContagemRegressiva(dados, inicioMs);
+      } else {
+        exibirPerguntaAgora(dados);
+      }
     }
+  }
+
+  function iniciarContagemRegressiva(dados, inicioMs) {
+    mostrarTela('contagem');
+    const elNumero = document.getElementById('numero-contagem');
+    const atualizar = () => {
+      if (estado.telaAtual !== 'contagem') { clearInterval(estado.contagemTimer); estado.contagemTimer = null; return; }
+      const restanteMs = inicioMs - QuizClient.agoraCorrigido();
+      if (restanteMs <= 0) {
+        clearInterval(estado.contagemTimer);
+        estado.contagemTimer = null;
+        exibirPerguntaAgora(dados);
+        return;
+      }
+      elNumero.textContent = Math.ceil(restanteMs / 1000);
+    };
+    atualizar();
+    if (estado.contagemTimer) clearInterval(estado.contagemTimer);
+    estado.contagemTimer = setInterval(atualizar, 200);
+  }
+
+  function exibirPerguntaAgora(dados) {
+    estado.respondida = false;
+    estado.cliquei = false;
+    estado.questaoAtualId = dados.pergunta.id;
+    estado.gabaritoRevelado = false;
+    estado.prazoFim = new Date(dados.prazo_fim).getTime();
+    estado.tempoLimiteMs = dados.tempo_por_pergunta_seg * 1000;
+    renderizarPergunta(dados);
+    mostrarTela('quiz');
+    if (!estado.tickTimer) estado.tickTimer = setInterval(tick, INTERVALO_TICK_MS);
+    tick();
   }
 
   function renderizarPergunta(dados) {
