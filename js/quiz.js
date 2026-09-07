@@ -9,22 +9,6 @@
 // por causa de rede lenta, celular travado ou aba em segundo
 // plano, e garante que todo mundo vê o mesmo prazo que o telão.
 (() => {
-  // ── Modo compacto (telas baixas) ──
-  // Calcula uma vez só, travando em classes no <body>, em vez de um
-  // @media (max-height) puro no CSS. No Chrome/Android a barra de
-  // endereço esconde e reaparece sozinha ao rolar a página, mudando
-  // window.innerHeight várias vezes por segundo — um @media reagiria
-  // a cada uma dessas mudanças, fazendo cabeçalho e card mudarem de
-  // tamanho e a tela "piscar" no meio da mesma pergunta. Recalcula só
-  // em orientationchange (giro de tela de verdade), nunca em resize.
-  function aplicarModoCompacto() {
-    const h = window.innerHeight;
-    document.body.classList.toggle('tela-compacta', h <= 900);
-    document.body.classList.toggle('tela-minima', h <= 600);
-  }
-  aplicarModoCompacto();
-  window.addEventListener('orientationchange', () => setTimeout(aplicarModoCompacto, 300));
-
   const CATEGORIAS = {
     operacoes: { label: 'Operações', cor: 'var(--cat-operacoes)' },
     logistica: { label: 'Logística', cor: 'var(--cat-logistica)' },

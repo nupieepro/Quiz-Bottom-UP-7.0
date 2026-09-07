@@ -19,20 +19,38 @@
 }
 .tela-central { width: 100%; max-width: 560px; }
 
+/* ── Escala fluida por altura de tela ──
+   Em vez de "modo normal" / "modo compacto" chaveado por breakpoint
+   ou por JS, todo espaçamento e fonte sensível à altura usa clamp()
+   com a unidade svh (small viewport height): o tamanho GARANTIDO da
+   tela, sem contar a barra de endereço do navegador — que soma ou
+   tira espaço sozinha, sem nenhuma ação da pessoa. Usar vh comum (ou
+   travar um valor via JS medido uma vez) faz o layout ora caber, ora
+   sobrar cortado, dependendo do instante exato em que a barra estava
+   visível ou escondida. svh nunca muda: o mesmo aparelho sempre
+   calcula o mesmo layout, e a tela se ajusta perfeitamente e
+   continuamente a cada tamanho de aparelho — não só a 2 ou 3 faixas
+   fixas. */
+.fundo-evento { min-height: 100svh; }
+
 /* ── Identificação ── */
 .cartao-identificacao { text-align: left; }
-.etiqueta-topo { margin-bottom: var(--s4); background: var(--cream-2); color: var(--orange); }
+.etiqueta-topo { margin-bottom: clamp(6px, 1.6svh, var(--s4)); background: var(--cream-2); color: var(--orange); }
 .titulo-hero {
-  font-size: clamp(28px, 6vw, 38px);
-  line-height: 1.08;
-  margin-bottom: var(--s3);
+  font-size: clamp(22px, min(6vw, 4.6svh), 38px);
+  line-height: 1.1;
+  margin-bottom: clamp(4px, 1svh, var(--s3));
 }
 .destaque-laranja { color: var(--orange); }
-.texto-intro { color: var(--ink-soft); font-size: 15px; line-height: 1.55; margin-bottom: var(--s6); }
+.texto-intro { color: var(--ink-soft); font-size: 15px; line-height: 1.5; margin-bottom: clamp(8px, 2svh, var(--s6)); }
+
+.campo { margin-bottom: clamp(8px, 1.8svh, var(--s5)); gap: clamp(3px, 0.7svh, 6px); }
+.campo input, .campo select, .campo textarea { padding: clamp(9px, 1.6svh, 13px) 16px; }
+.campo label { font-size: clamp(11px, 1.5svh, 13px); }
 
 /* ── Quiz ── */
-.cartao-quiz { padding: var(--s6); }
-.cabecalho-quiz { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); margin-bottom: var(--s5); }
+.cartao-quiz { padding: clamp(12px, 2.6svh, var(--s6)); }
+.cabecalho-quiz { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); margin-bottom: clamp(8px, 1.8svh, var(--s5)); }
 .progresso-info { flex: 1; }
 .progresso-info span { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; }
 .barra-progresso { height: 6px; background: var(--border-soft); border-radius: var(--r-full); margin-top: 6px; overflow: hidden; }
@@ -41,13 +59,13 @@
 .rotulo-placar { display: block; font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; }
 .valor-placar { font-family: var(--fonte-mono); font-size: 22px; font-weight: 700; color: var(--navy); }
 
-.linha-meta { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s5); }
+.linha-meta { display: flex; align-items: center; gap: var(--s2); margin-bottom: clamp(8px, 1.8svh, var(--s5)); }
 .linha-meta .badge-dificuldade,
 #badge-dificuldade { background: var(--cream-2); color: var(--ink-soft); }
 .linha-meta { position: relative; }
 
-.timer { margin-left: auto; position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
-.timer-anel { width: 44px; height: 44px; transform: rotate(-90deg); position: absolute; inset: 0; }
+.timer { margin-left: auto; position: relative; width: clamp(32px, 5.5svh, 44px); height: clamp(32px, 5.5svh, 44px); display: flex; align-items: center; justify-content: center; }
+.timer-anel { width: 100%; height: 100%; transform: rotate(-90deg); position: absolute; inset: 0; }
 .timer-trilha { fill: none; stroke: var(--border-soft); stroke-width: 3; }
 .timer-progresso {
   fill: none; stroke: var(--orange); stroke-width: 3; stroke-linecap: round;
@@ -55,19 +73,19 @@
   transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
 }
 .timer-progresso.tempo-critico { stroke: var(--erro); }
-#timer-segundos { font-family: var(--fonte-mono); font-size: 13px; font-weight: 700; color: var(--ink); position: relative; z-index: 1; }
+#timer-segundos { font-family: var(--fonte-mono); font-size: clamp(11px, 1.8svh, 13px); font-weight: 700; color: var(--ink); position: relative; z-index: 1; }
 
-.enunciado { font-size: clamp(19px, 3.6vw, 23px); line-height: 1.35; margin-bottom: var(--s6); }
+.enunciado { font-size: clamp(16px, min(3.6vw, 2.6svh), 23px); line-height: 1.3; margin-bottom: clamp(8px, 2.2svh, var(--s6)); }
 
-.opcoes { display: flex; flex-direction: column; gap: var(--s3); }
+.opcoes { display: flex; flex-direction: column; gap: clamp(5px, 1svh, var(--s3)); }
 .opcao {
   display: flex; align-items: center; gap: var(--s3);
   text-align: left;
   border: 2px solid var(--border-soft);
   background: var(--cream-2);
   border-radius: var(--r-md);
-  padding: 14px 16px;
-  font-size: 15.5px;
+  padding: clamp(8px, 1.4svh, 14px) 16px;
+  font-size: clamp(13.5px, 2svh, 15.5px);
   font-weight: 600;
   color: var(--ink);
   cursor: pointer;
@@ -76,12 +94,12 @@
 .opcao:hover:not(:disabled) { border-color: var(--orange-2); background: #fff; transform: translateX(2px); }
 .opcao:disabled { cursor: default; }
 .opcao .letra-opcao {
-  width: 30px; height: 30px; flex-shrink: 0;
+  width: clamp(24px, 4.2svh, 30px); height: clamp(24px, 4.2svh, 30px); flex-shrink: 0;
   border-radius: 50%;
   background: var(--white);
   border: 2px solid var(--border-medium);
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--fonte-mono); font-weight: 700; font-size: 13px; color: var(--ink-soft);
+  font-family: var(--fonte-mono); font-weight: 700; font-size: clamp(11px, 1.8svh, 13px); color: var(--ink-soft);
 }
 .opcao.selecionada { border-color: var(--navy); background: #fff; }
 .opcao.selecionada .letra-opcao { background: var(--navy); border-color: var(--navy); color: #fff; }
@@ -100,67 +118,29 @@
 
 /* ── Resultado / mensagem ── */
 .cartao-resultado, .cartao-mensagem { text-align: center; }
-.medalha { font-size: 56px; margin-bottom: var(--s3); }
-.titulo-resultado { font-size: 26px; margin-bottom: var(--s2); }
-.texto-resultado { color: var(--ink-soft); font-size: 15px; margin-bottom: var(--s6); }
-.grade-resultado { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s3); margin-bottom: var(--s8); }
+.medalha { font-size: clamp(36px, 7svh, 56px); margin-bottom: clamp(4px, 1svh, var(--s3)); }
+.titulo-resultado { font-size: clamp(20px, 3.4svh, 26px); margin-bottom: var(--s2); }
+.texto-resultado { color: var(--ink-soft); font-size: 15px; margin-bottom: clamp(8px, 1.8svh, var(--s6)); }
+.grade-resultado { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s3); margin-bottom: clamp(12px, 2.6svh, var(--s8)); }
 .metrica { background: var(--cream-2); border-radius: var(--r-md); padding: var(--s4) var(--s2); }
 .metrica-destaque { background: linear-gradient(155deg, var(--navy) 0%, var(--navy-2) 100%); }
 .metrica-destaque .metrica-valor { color: var(--orange-2); }
 .metrica-destaque .metrica-rotulo { color: var(--on-navy-soft); }
 .metrica-valor { display: block; font-family: var(--fonte-mono); font-size: 24px; font-weight: 700; color: var(--navy); }
 .metrica-rotulo { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.03em; }
-.nota-rodape { margin-top: var(--s5); font-size: 13px; color: var(--ink-faint); }
+.nota-rodape { margin-top: clamp(6px, 1.4svh, var(--s5)); font-size: 13px; color: var(--ink-faint); }
 
 @media (max-width: 480px) {
   .grade-resultado { grid-template-columns: 1fr; }
 }
 
-/* ── Encaixe sem rolagem em telas baixas ──
-   O alvo é a altura da tela (não a largura): um celular estreito e
-   alto sobra espaço, mas um celular baixo (ou o teclado abrindo)
-   aperta. Comprime cabeçalho e espaçamentos da tela de pergunta —
-   que é a mais cheia — pra caber inteira sem precisar rolar.
-   Importante: isso é uma CLASSE no <body> (calculada uma vez em
-   js/quiz.js), não um @media (max-height). A barra de endereço do
-   Chrome/Android esconde e reaparece sozinha ao rolar, mudando a
-   altura da tela várias vezes por segundo — um @media aqui ficaria
-   ligando e desligando ao vivo, fazendo cabeçalho e card mudarem de
-   tamanho na mesma pergunta. Calculando uma vez só e travando numa
-   classe, o layout já escolhido nunca mais pisca. */
-body.tela-compacta .topo-quiz { padding: 10px var(--s4); }
-body.tela-compacta .topo-quiz .selo-quadrado { width: 34px; height: 34px; border-radius: 9px; }
-body.tela-compacta .topo-quiz .selo-quadrado span { font-size: 17px; }
-body.tela-compacta .topo-quiz .subtitulo-evento { display: none; }
-body.tela-compacta .conteudo-quiz { padding: var(--s3) var(--s4); }
-body.tela-compacta .cartao-quiz { padding: var(--s4); }
-body.tela-compacta .cabecalho-quiz { margin-bottom: var(--s3); }
-body.tela-compacta .linha-meta { margin-bottom: var(--s3); }
-body.tela-compacta .timer, body.tela-compacta .timer-anel { width: 36px; height: 36px; }
-body.tela-compacta .enunciado { font-size: clamp(17px, 4vw, 21px); line-height: 1.28; margin-bottom: var(--s4); }
-body.tela-compacta .opcoes { gap: 8px; }
-body.tela-compacta .opcao { padding: 11px 14px; font-size: 14.5px; }
-body.tela-compacta .opcao .letra-opcao { width: 26px; height: 26px; font-size: 12px; }
-body.tela-compacta .campo { margin-bottom: var(--s3); }
-body.tela-compacta .etiqueta-topo { margin-bottom: var(--s3); }
-body.tela-compacta .titulo-hero { margin-bottom: var(--s2); }
-body.tela-compacta .texto-intro { margin-bottom: var(--s4); }
-body.tela-compacta .medalha { font-size: 44px; margin-bottom: var(--s2); }
-body.tela-compacta .titulo-resultado { font-size: 22px; }
-body.tela-compacta .texto-resultado { margin-bottom: var(--s4); }
-body.tela-compacta .grade-resultado { margin-bottom: var(--s5); }
-body.tela-compacta .nota-rodape { margin-top: var(--s3); }
-
-/* Telas realmente minúsculas (celulares antigos, ex.: 320×568) —
-   aperta mais um degrau em cima do anterior. Mesma lógica: classe
-   travada, não @media. */
-body.tela-minima .titulo-hero { font-size: clamp(23px, 6vw, 30px); }
-body.tela-minima .campo { margin-bottom: var(--s2); gap: 4px; }
-body.tela-minima .campo input { padding: 9px 14px; }
-body.tela-minima .campo label { font-size: 12px; }
-body.tela-minima .etiqueta-topo { display: none; }
-body.tela-minima .cartao { padding: var(--s4); }
-body.tela-minima .cabecalho-quiz, body.tela-minima .linha-meta { margin-bottom: 8px; }
-body.tela-minima .enunciado { font-size: 16px; margin-bottom: 10px; }
-body.tela-minima .opcoes { gap: 6px; }
-body.tela-minima .opcao { padding: 9px 12px; font-size: 14px; }
+/* ── Cabeçalho e cartão desta página, também na escala fluida ──
+   .topo/.cartao já existem em base.css (compartilhados com admin e
+   ranking); aqui só a versão usada nesta página ganha o ajuste por
+   svh, sem mexer nas outras. */
+.topo-quiz { padding: clamp(6px, 1.3svh, var(--s5)) var(--s4); }
+.topo-quiz .selo-quadrado { width: clamp(30px, 5.2svh, 44px); height: clamp(30px, 5.2svh, 44px); }
+.topo-quiz .selo-quadrado span { font-size: clamp(14px, 2.6svh, 22px); }
+.topo-quiz .subtitulo-evento { font-size: clamp(9px, 1.4svh, 12px); }
+.conteudo-quiz { padding-top: clamp(8px, 2svh, var(--s6)); padding-bottom: clamp(8px, 2svh, var(--s6)); }
+.cartao:not(.cartao-quiz) { padding: clamp(14px, 3svh, var(--s8)); }
